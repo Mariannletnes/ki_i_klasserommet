@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planlegging: design for læring med KI — Når KI er i rommet</title>
+<meta name="description" content="Interaktivt planleggingsverktøy for lærere, bygd på Selander og Kress’ modell for design av en læringssekvens, med et spørsmål om KI i hvert steg.">
+<meta name="theme-color" content="#1E2A45">
+<link rel="icon" type="image/svg+xml" href="../ikon.svg">
+<link rel="stylesheet" href="verktoy.css">
+<script src="../js/jspdf.umd.min.js"></script>
+<style>
+
+/* Skriftene ligger lokalt i fonts/, så ingen besøkende sendes videre til Google. */
+/* ============ Tokens ============ */
+:root{
+  /* Samme palett som ressursportalen «Læring i en digital tid» */
+  --paper:#f0ece2;
+  --stone:#f0ece2;
+  --surface:#fffdf8;
+  --dark:#1e2a45;
+  --plum:#9e7a8a;
+  --ink:#1e2a45;
+  --body:#555250;
+  --quiet:#5a5650;
+  --hair:#d9d5cc;
+  --hair-stone:#cac6bc;
+  --shadow:0 15px 40px rgba(30,42,69,.07);
+
+  /* De fire fasene i modellen. Turkis og oransje er de samme
+     som de to transformasjonssyklusene har i presentasjonen. */
+  --start:#9e7a8a;  --start-soft:#eee3e8;
+  --c1:#4f7d72;     --c1-soft:#e4ebe6;
+  --c2:#b0643a;     --c2-soft:#f3e6dc;
+  --all:#1e2a45;    --all-soft:#e3e5ea;
+}
+
+/* ============ Grunnlag ============ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--body);
+  font-family:var(--sans);
+  font-weight:400;
+  font-size:1.05rem;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
+h1,h2,h3,p{margin:0}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit}
+:focus-visible{outline:3px solid #c6794d;outline-offset:3px}
+
+.wrap{max-width:780px;margin-inline:auto;width:100%;padding-inline:24px}
+
+/* ============ Innledning og modulfelt ============ */
+.intro{
+  margin-top:18px;
+  padding:22px 24px;
+  background:var(--surface);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+}
+.intro-h1-unused{
+  font-family:var(--serif);
+  font-weight:300;
+  font-size:clamp(1.9rem,4.4vw,2.5rem);
+  line-height:1.1;
+  color:var(--ink);
+  margin-bottom:8px;
+}
+.intro p{font-size:1.02rem;line-height:1.6}
+
+.module-row{
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--hair);
+}
+.module-row label{
+  display:block;
+  font-size:.86rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:500;
+  color:var(--plum);
+  margin-bottom:7px;
+}
+.module-row input{
+  width:100%;
+  padding:13px 15px;
+  background:var(--paper);
+  color:var(--ink);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  font-size:1.02rem;
+}
+.module-row input::placeholder{color:var(--quiet)}
+
+/* ============ Framdriftssporet ============ */
+.track{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:14px;
+  margin-bottom:24px;
+}
+.phase{--c:var(--plum)}
+.phase-name{
+  display:block;
+  font-size:.68rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:500;
+  color:var(--c);
+  margin-bottom:6px;
+  white-space:nowrap;
+}
+.segs{display:flex;gap:5px}
+.seg{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:1.5px solid var(--c);
+  background:transparent;
+  color:var(--c);
+  font-size:.82rem;
+  padding:0;
+  transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+}
+.seg.filled{background:var(--c);color:#fff}
+.seg.current{box-shadow:0 0 0 3px var(--c-soft)}
+.seg-plan{
+  width:auto;
+  padding:0 14px;
+  border-radius:999px;
+  font-size:.8rem;
+  letter-spacing:.04em;
+}
+
+/* ============ Kortet ============ */
+main{flex:1;padding-bottom:16px}
+.card{
+  margin-top:18px;
+  padding:clamp(24px,4vw,38px);
+  background:var(--surface);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  border-top:6px solid var(--c, var(--plum));
+}
+
+.kicker{
+  display:inline-block;
+  font-size:.74rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:500;
+  color:var(--c);
+  background:var(--c-soft);
+  padding:5px 12px;
+  border-radius:999px;
+  margin-bottom:12px;
+}
+.step-title{
+  font-family:var(--serif);
+  font-weight:300;
+  font-size:clamp(1.7rem,4.4vw,2.35rem);
+  line-height:1.12;
+  color:var(--ink);
+  margin-bottom:14px;
+}
+.step-desc{
+  font-size:1.05rem;
+  line-height:1.65;
+  margin-bottom:22px;
+  max-width:62ch;
+}
+.prompt{
+  font-size:1.06rem;
+  color:var(--ink);
+  font-weight:500;
+  line-height:1.5;
+  margin-bottom:12px;
+  max-width:62ch;
+}
+textarea{
+  width:100%;
+  min-height:170px;
+  padding:16px 18px;
+  background:var(--paper);
+  color:var(--ink);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  font-size:1.05rem;
+  line-height:1.6;
+  resize:vertical;
+  transition:border-color .16s ease;
+}
+textarea:focus{border-color:var(--c)}
+textarea::placeholder{color:var(--quiet)}
+
+/* ============ KI-spørsmålet ============ */
+.ki-box{
+  margin:0 0 16px;
+  padding:14px 16px;
+  background:var(--all-soft);
+  border-radius:var(--radius-lg);
+  max-width:62ch;
+}
+.ki-label{
+  display:block;
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:500;
+  color:var(--all);
+  margin-bottom:4px;
+}
+.ki-text{font-size:1rem;line-height:1.55;color:var(--ink)}
+
+/* ============ Oppsummeringen ============ */
+.plan-list{list-style:none;padding:0;margin:0}
+.plan-item{
+  width:100%;
+  text-align:left;
+  display:block;
+  padding:16px 18px;
+  margin-bottom:10px;
+  background:var(--paper);
+  border:1px solid var(--hair);
+  border-left:5px solid var(--c);
+  border-radius:0 16px 16px 0;
+  transition:background .16s ease;
+}
+.plan-item:hover{background:var(--c-soft)}
+.plan-kicker{
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:500;
+  color:var(--c);
+  margin-bottom:3px;
+}
+.plan-title{
+  font-family:var(--serif);
+  font-weight:300;
+  font-size:1.28rem;
+  color:var(--ink);
+  margin-bottom:5px;
+}
+.plan-answer{font-size:1rem;line-height:1.55;white-space:pre-wrap;color:var(--body)}
+.plan-empty{font-size:1rem;color:var(--quiet);font-style:italic}
+
+.count{
+  font-size:.95rem;
+  color:var(--quiet);
+  margin-bottom:16px;
+}
+.summary-note{
+  font-size:.94rem;
+  color:var(--quiet);
+  margin-top:20px;
+  line-height:1.6;
+}
+.download-btn{
+  margin-top:16px;
+  background:var(--dark);
+  color:#F7F1F2;
+  border:none;
+  font-size:1.02rem;
+  padding:15px 28px;
+  border-radius:var(--radius-sm);
+  transition:background .2s ease;
+}
+.download-btn:hover{background:var(--ink)}
+
+/* ============ Navigasjon ============ */
+.nav-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:26px;
+  gap:16px;
+}
+.btn-next{
+  flex:1;
+  background:var(--dark);
+  color:#F7F1F2;
+  border:none;
+  font-size:1.04rem;
+  padding:16px 30px;
+  border-radius:var(--radius-sm);
+  text-align:center;
+  transition:background .2s ease;
+}
+.btn-next:hover{background:var(--ink)}
+.btn-prev{
+  background:transparent;
+  border:none;
+  color:var(--quiet);
+  font-size:1.02rem;
+  padding:16px 6px;
+}
+.btn-prev:disabled{opacity:0;pointer-events:none}
+.btn-prev:not(:disabled):hover{color:var(--plum)}
+
+/* ============ Lagring ============ */
+.footer-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  padding-top:18px;
+  padding-bottom:36px;
+  font-size:.92rem;
+  color:var(--quiet);
+}
+.saved{display:flex;align-items:center;gap:8px}
+.saved-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--hair-stone);
+  transition:background .3s ease;
+}
+.saved.on .saved-dot{background:#4F7D72}
+.restart{
+  background:none;
+  border:none;
+  padding:0 0 2px;
+  color:var(--quiet);
+  font-size:.92rem;
+  box-shadow:inset 0 -1px 0 var(--hair-stone);
+}
+.restart:hover{color:var(--plum);box-shadow:inset 0 -1px 0 var(--plum)}
+
+/* ============ Mobil ============ */
+@media (max-width:620px){
+  .wrap{padding-inline:16px}
+  .phase-name{display:none}
+  .track{gap:9px 11px;align-items:center}
+  .seg{width:26px;height:26px;font-size:.78rem}
+  /* Må gjenta bredden her, ellers klipper regelen over «Plan»-teksten. */
+  .seg-plan{width:auto;height:26px;padding:0 13px;font-size:.74rem}
+  .card{border-radius:var(--radius-lg)}
+  textarea{min-height:150px}
+}
+
+/* ============ Redusert bevegelse ============ */
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important}
+}
+
+/* ============ Sidens farger (overstyrer verdiene over) ============ */
+:root{
+  --paper:var(--cream); --stone:var(--lin); --surface:#fff; --dark:var(--marine);
+  --plum:var(--mauve-ink); --ink:var(--text); --body:var(--text-soft); --quiet:var(--text-pale);
+  --hair:var(--lin-dark); --hair-stone:var(--lin-dark);
+  --shadow:0 12px 36px rgba(30,42,69,.08);
+
+  /* fasene i modellen: de to transformasjonssyklusene har samme farger som i presentasjonen, dempet */
+  --start:#B07A93; --start-soft:#F3E8ED;
+  --c1:#3F7470;    --c1-soft:#E3EEEC;
+  --c2:#A8603A;    --c2-soft:#F5E8DF;
+  --all:#1E2A45;   --all-soft:#E6E9F1;
+
+  /* de fire sporene i nettloggen */
+  --alone:#34497A; --alone-soft:#E6E9F1;
+  --group:#9A7B4F; --group-soft:#F2ECE2;
+  --ki:#7E4A62;    --ki-soft:#F3E8ED;
+  --vis:#3F7470;   --vis-soft:#E3EEEC;
+}
+body{background:var(--cream);color:var(--text-soft)}
+:focus-visible{outline:2px solid var(--mauve);outline-offset:3px}
+
+/* ============ Felles for stegverktøyene ============ */
+.tool-wrap{max-width:820px;margin-inline:auto;width:100%;padding-inline:24px}
+.tool-intro{margin-top:-2.2rem;position:relative;z-index:2;padding:22px 24px;background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+.tool-intro > p{font-size:1.02rem;line-height:1.65;color:var(--text-soft);margin:0}
+.tool-intro > p + p{margin-top:.6rem}
+.tool-source{font-size:.85rem!important;color:var(--text-pale)!important}
+#card{scroll-margin-top:80px}
+@media (max-width:720px){#card{scroll-margin-top:12px}}
+@media (max-width:620px){.tool-wrap{padding-inline:16px}.tool-intro{margin-top:-1.6rem}}
+
+</style>
+</head>
+<body>
+<a class="skip" href="#innhold">Hopp til innholdet</a>
+
+<nav class="site-nav" aria-label="Hovedmeny">
+  <div class="nav-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <ul class="nav-links">
+      <li><a href="../bolk-1-engasjement.html">Engasjement</a></li>
+      <li><a href="../bolk-2-elevstemmer.html">Elevstemmer</a></li>
+      <li><a href="../bolk-3-design.html">Design</a></li>
+      <li><a href="../bolk-4-vurdering.html">Vurdering</a></li>
+      <li><a href="../index.html#verktoy" aria-current="page">Verktøy</a></li>
+      <li><a href="https://mariannletnes.com" class="sub">Mari-Ann Letnes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="v-hero">
+  <div class="v-hero-inner">
+    <p class="v-crumb"><a href="../index.html#verktoy">← Alle verktøy</a></p>
+    <p class="v-kicker">Planlegging · Verktøy</p>
+    <h1>Design for læring <em>med KI</em></h1>
+    <p class="v-desc">Planlegg et læringsforløp i ni steg, fra mål og ressurser til tegn på læring. Planen lagres i nettleseren mens dere arbeider, og kan lastes ned som PDF.</p>
+  </div>
+</header>
+
+<div class="wrap tool-wrap">
+  <div class="intro tool-intro">
+    <p>Snakk sammen i faggruppa om hvert punkt før dere skriver. Det dere blir enige om, skriver dere her. Hvert steg har også et spørsmål om hvilken plass KI skal ha.</p>
+    <p class="tool-source">Bygger på Selander &amp; Kress (2010) og Letnes (under utgivelse).</p>
+    <div class="module-row">
+      <label for="moduleName">Hvilket fag og tema planlegger dere?</label>
+      <input id="moduleName" placeholder="For eksempel: Norsk vg1, argumenterende tekster">
+    </div>
+  </div>
+</div>
+
+<main class="wrap tool-wrap" id="innhold">
+  <div class="card" id="card">
+    <div class="track" id="track" role="group" aria-label="Punkter i planleggingen"></div>
+
+    <p class="kicker" id="stepKicker"></p>
+    <h2 class="step-title" id="stepTitle"></h2>
+    <p class="step-desc" id="stepDesc"></p>
+    <div id="inputArea"></div>
+    <div id="summaryArea"></div>
+
+    <div class="nav-row">
+      <button class="btn-prev" type="button" id="prevBtn">Forrige</button>
+      <button class="btn-next" type="button" id="nextBtn">Neste</button>
+    </div>
+  </div>
+</main>
+
+<div class="footer-row wrap tool-wrap">
+  <span class="saved" id="saved"><span class="saved-dot" aria-hidden="true"></span><span id="savedText">Lagres i nettleseren på denne enheten</span></span>
+  <button class="restart" type="button" id="restartBtn">Tøm og start på nytt</button>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <p class="footer-info">
+      Mari-Ann Letnes &nbsp;·&nbsp; Institutt for lærerutdanning, NTNU &nbsp;·&nbsp; <a href="mailto:mari.ann.letnes@ntnu.no">mari.ann.letnes@ntnu.no</a><br>
+      Elevstemmene er fiktive &nbsp;·&nbsp; <a href="https://mariannletnes.com">mariannletnes.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  /* ============================================================
+     Modellens fire faser. Turkis og oransje er de to
+     transformasjonssyklusene, som i presentasjonen.
+     Hvert steg har også et KI-spørsmål (feltet «ki»).
+     ============================================================ */
+  var phases = {
+    start:{ name:"Utgangspunktet" },
+    c1:   { name:"Første syklus" },
+    c2:   { name:"Andre syklus" },
+    all:  { name:"Gjennomgående" }
+  };
+
+  var steps = [
+    {
+      phase: "start",
+      kicker: "Utgangspunktet",
+      title: "Ressurser, mål og rammer",
+      desc: "Modellen starter med det som er gitt før økta i det hele tatt begynner: kompetansemål, ressurser som lærebok, kilder og KI-verktøy, og de institusjonelle føringene, altså normer, rutiner og regler, som styrer rommet dere jobber i.",
+      prompt: "Hva er de viktigste målene, ressursene og føringene for det dere planlegger?",
+      ki: "Hvilke KI-verktøy har elevene tilgang til, og hvilke rammer for KI-bruk gjelder på skolen?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "start",
+      kicker: "Utgangspunktet",
+      title: "Didaktisk analyse",
+      desc: "Metoden kommer etter analysen. Hva kan innholdet åpne for elevene? Hvorfor betyr det noe nå? Hva er kjernen, og hvor ligger de vanskelige overgangene?",
+      prompt: "Hva er kjernen i innholdet, og hva må elevene forstå selv?",
+      ki: "Hvor vil KI ta over det eleven må gjøre selv, og hvor kan KI åpne en vei inn?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "c1",
+      kicker: "Første transformasjonssyklus",
+      title: "Iscenesetting",
+      desc: "Hvordan setter du scenen? Dette er det første møtet med innholdet, rammen som gjør at elevene vet hva som skal skje og hvorfor.",
+      prompt: "Hvordan vil dere iscenesette dette forløpet?",
+      ki: "Hvordan forteller dere elevene hva KI skal brukes til, og hva de må gjøre selv?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "c1",
+      kicker: "Første transformasjonssyklus",
+      title: "Transformering",
+      desc: "Her arbeider elevene aktivt med stoffet og de tilgjengelige ressursene og gjør det til sitt eget. Dette er kjernen i «design i læring»: at elevene selv får omforme det de møter.",
+      prompt: "Hvilke ressurser skal elevene bruke aktivt, og hvordan?",
+      ki: "Hvilken rolle skal KI ha her: forklare, gi eksempler, foreslå alternativer, gi tilbakemelding eller stille spørsmål tilbake?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "c1",
+      kicker: "Første transformasjonssyklus",
+      title: "Behandling",
+      desc: "Etter at elevene har jobbet med stoffet, bearbeides det videre. Det som var løst og utforskende, begynner å ta form.",
+      prompt: "Hvordan skal bearbeidingen skje? Får elevene lage noe synlig av forståelsen sin, en podkast, en tekst, en tegning, eller blir den værende i hodet eller i KI-chatten?",
+      ki: "Hvordan gjør dere elevenes eget arbeid synlig underveis, slik at loggen blir en del av arbeidet?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "c2",
+      kicker: "Andre transformasjonssyklus",
+      title: "Representasjon",
+      desc: "Nå skal det som er bearbeidet komme til uttrykk. Elevene viser fram det de har forstått, i en form andre kan se eller høre, gjerne for en ekte mottaker.",
+      prompt: "Hvordan kan elevene vise fram det de har forstått, og for hvem?",
+      ki: "Kan eleven forklare og stå inne for det som vises, også det KI har bidratt til?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "c2",
+      kicker: "Andre transformasjonssyklus",
+      title: "Diskusjon og metarefleksjon",
+      desc: "Uttrykket blir gjenstand for felles refleksjon. I metasamtalen vender elevene tilbake til det de har skapt, og setter ord på valg, begrunnelser og det de oppdaget underveis.",
+      prompt: "Hvordan skaper dere rom for denne samtalen? Er det dere, KI eller elevene som stiller spørsmålene?",
+      ki: "Hvilke KI-svar måtte elevene tolke, justere eller forkaste, og hvordan får dere dem til å sette ord på det?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "c2",
+      kicker: "Andre transformasjonssyklus",
+      title: "Forståelse",
+      desc: "Til slutt lander det hele i en forståelse, en form det har tatt denne gangen. Forståelsen kan fortsatt være underveis. Dette er et stoppested.",
+      prompt: "Hva sitter elevene igjen med etter dette forløpet?",
+      ki: "Hva forstår eleven annerledes nå, og hvilken rolle hadde KI i den endringen?",
+      placeholder: "Skriv det dere blir enige om …"
+    },
+    {
+      phase: "all",
+      kicker: "Gjennomgående",
+      title: "Tegn på læring",
+      desc: "Gjennom hele forløpet spør vi: Hva erkjenner vi som tegn på læring? Når KI kan ha laget produktet, trenger dere flere tegn enn produktet. Les tegnene i sammenheng: det dere ser underveis, sporene i logger og utkast, og det eleven setter ord på.",
+      prompt: "Hva vil dere se etter som tegn på at det virket, hos den enkelte og i gruppa? Fanger dere tegnene opp underveis, eller først i etterkant?",
+      ki: "Hvilke tegn vil dere sammenholde, og hva gjør dere hvis produktet og samtalen spriker?",
+      placeholder: "Skriv det dere blir enige om …"
+    }
+  ];
+
+  var answers = {};
+  var moduleName = "";
+  var current = 0;
+  var totalSteps = steps.length + 1; // +1 for oppsummeringen
+
+  var cardEl     = document.getElementById('card');
+  var trackEl    = document.getElementById('track');
+  var kickerEl   = document.getElementById('stepKicker');
+  var titleEl    = document.getElementById('stepTitle');
+  var descEl     = document.getElementById('stepDesc');
+  var inputArea  = document.getElementById('inputArea');
+  var summaryArea= document.getElementById('summaryArea');
+  var prevBtn    = document.getElementById('prevBtn');
+  var nextBtn    = document.getElementById('nextBtn');
+  var restartBtn = document.getElementById('restartBtn');
+  var moduleInput= document.getElementById('moduleName');
+  var savedEl    = document.getElementById('saved');
+  var savedText  = document.getElementById('savedText');
+
+  /* ============================================================
+     Lagring. Alt blir liggende i nettleseren på denne enheten,
+     slik at gruppa kan lukke fanen og komme tilbake senere.
+     Ingenting sendes noe sted.
+     ============================================================ */
+  var STORE_KEY = 'design-for-laering-ki-plan-v1';
+  var saveTimer = null;
+  var flashTimer = null;
+
+  function loadSaved(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      answers = (data && data.answers) ? data.answers : {};
+      moduleName = (data && data.moduleName) ? data.moduleName : "";
+    }catch(e){ /* privat vindu eller blokkert lagring — verktøyet virker uansett */ }
+  }
+
+  function saveSoon(){
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 400);
+  }
+
+  function saveNow(){
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify({ answers:answers, moduleName:moduleName }));
+      flashSaved();
+    }catch(e){
+      savedText.textContent = 'Last ned planen før du lukker siden. Denne nettleseren holder den bare mens siden er åpen.';
+    }
+  }
+
+  function flashSaved(){
+    savedEl.classList.add('on');
+    savedText.textContent = 'Lagret';
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(function(){
+      savedEl.classList.remove('on');
+      savedText.textContent = 'Lagres i nettleseren på denne enheten';
+    }, 1600);
+  }
+
+  function clearSaved(){
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  }
+
+  /* ============ Framdriftssporet ============ */
+  function renderTrack(){
+    trackEl.innerHTML = '';
+
+    var order = ['start','c1','c2','all'];
+    order.forEach(function(key){
+      var idxs = [];
+      steps.forEach(function(s, i){ if (s.phase === key) idxs.push(i); });
+      if (idxs.length === 0) return;
+
+      var group = document.createElement('div');
+      group.className = 'phase';
+      group.style.setProperty('--c', 'var(--' + key + ')');
+      group.style.setProperty('--c-soft', 'var(--' + key + '-soft)');
+
+      var name = document.createElement('span');
+      name.className = 'phase-name';
+      name.textContent = phases[key].name;
+      group.appendChild(name);
+
+      var segs = document.createElement('div');
+      segs.className = 'segs';
+      idxs.forEach(function(i){
+        var b = document.createElement('button');
+        b.type = 'button';
+        var filled = (answers[i] || '').trim() !== '';
+        b.className = 'seg' + (filled ? ' filled' : '') + (i === current ? ' current' : '');
+        b.textContent = i + 1;
+        b.setAttribute('aria-label', 'Punkt ' + (i + 1) + ': ' + steps[i].title + (filled ? ' — fylt ut' : ' — tomt'));
+        if (i === current) b.setAttribute('aria-current', 'step');
+        b.addEventListener('click', function(){ current = i; render(); });
+        segs.appendChild(b);
+      });
+      group.appendChild(segs);
+      trackEl.appendChild(group);
+    });
+
+    /* Egen knapp til den samlede planen. */
+    var last = document.createElement('div');
+    last.className = 'phase';
+    last.style.setProperty('--c', 'var(--dark)');
+    last.style.setProperty('--c-soft', 'var(--hair)');
+    var lname = document.createElement('span');
+    lname.className = 'phase-name';
+    lname.textContent = 'Samlet';
+    last.appendChild(lname);
+
+    var segs2 = document.createElement('div');
+    segs2.className = 'segs';
+    var pb = document.createElement('button');
+    pb.type = 'button';
+    pb.className = 'seg seg-plan' + (current === steps.length ? ' filled current' : '');
+    pb.textContent = 'Plan';
+    pb.setAttribute('aria-label', 'Gå til den samlede planen');
+    pb.addEventListener('click', function(){ current = steps.length; render(); });
+    segs2.appendChild(pb);
+    last.appendChild(segs2);
+    trackEl.appendChild(last);
+  }
+
+  /* ============ Den samlede planen ============ */
+  function renderSummary(){
+    summaryArea.innerHTML = '';
+
+    var filled = 0;
+    for (var n = 0; n < steps.length; n++){
+      if ((answers[n] || '').trim() !== '') filled++;
+    }
+    var count = document.createElement('p');
+    count.className = 'count';
+    count.textContent = filled + ' av ' + steps.length + ' punkter fylt ut. Trykk på et punkt for å gå tilbake og skrive mer.';
+    summaryArea.appendChild(count);
+
+    var list = document.createElement('ul');
+    list.className = 'plan-list';
+
+    steps.forEach(function(s, i){
+      var li = document.createElement('li');
+
+      var item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'plan-item';
+      item.style.setProperty('--c', 'var(--' + s.phase + ')');
+      item.style.setProperty('--c-soft', 'var(--' + s.phase + '-soft)');
+      item.addEventListener('click', function(){ current = i; render(); });
+
+      var k = document.createElement('span');
+      k.className = 'plan-kicker';
+      k.style.display = 'block';
+      k.textContent = s.kicker;
+
+      var t = document.createElement('span');
+      t.className = 'plan-title';
+      t.style.display = 'block';
+      t.textContent = s.title;
+
+      var a = document.createElement('span');
+      var txt = answers[i] ? answers[i] : '';
+      a.className = txt ? 'plan-answer' : 'plan-empty';
+      a.style.display = 'block';
+      a.textContent = txt ? txt : 'Står åpent.';
+
+      item.appendChild(k);
+      item.appendChild(t);
+      item.appendChild(a);
+      li.appendChild(item);
+      list.appendChild(li);
+    });
+    summaryArea.appendChild(list);
+
+    var note = document.createElement('p');
+    note.className = 'summary-note';
+    note.textContent = 'Planen ligger lagret i nettleseren på denne enheten. Last den ned hvis dere skal dele den eller bruke den et annet sted.';
+    summaryArea.appendChild(note);
+
+    var dlBtn = document.createElement('button');
+    dlBtn.type = 'button';
+    dlBtn.className = 'download-btn';
+    dlBtn.textContent = 'Last ned planen (.pdf)';
+    dlBtn.addEventListener('click', downloadAnswers);
+    summaryArea.appendChild(dlBtn);
+  }
+
+  /* ============ Nedlasting ============ */
+  function downloadAnswers(){
+    if (window.jspdf && window.jspdf.jsPDF){ downloadAsPDF(); }
+    else { downloadAsTxt(); }
+  }
+
+  function downloadAsPDF(){
+    var doc = new window.jspdf.jsPDF();
+    var margin = 20;
+    var maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+    var pageBottom = 280;
+    var y = 24;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    doc.text('Design for læring med KI — vår plan', margin, y);
+    y += 8;
+
+    if (moduleName.trim() !== ''){
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.setTextColor(60, 60, 60);
+      var mod = doc.splitTextToSize('Fag og tema: ' + moduleName.trim(), maxWidth);
+      for (var m = 0; m < mod.length; m++){ doc.text(mod[m], margin, y); y += 6; }
+      y += 2;
+    }
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.text('Basert på Selander & Kress (2010), Design för lärande, og Letnes (under utgivelse)', margin, y);
+    doc.setTextColor(20, 20, 20);
+    y += 14;
+
+    for (var i = 0; i < steps.length; i++){
+      var s = steps[i];
+      if (y > pageBottom - 20){ doc.addPage(); y = 24; }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(130, 90, 100);
+      doc.text(s.kicker, margin, y);
+      y += 6;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(20, 20, 20);
+      doc.text(s.title, margin, y);
+      y += 8;
+
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(10);
+      doc.setTextColor(110, 81, 160);
+      var kiLines = doc.splitTextToSize('KI: ' + s.ki, maxWidth);
+      for (var q = 0; q < kiLines.length; q++){
+        if (y > pageBottom){ doc.addPage(); y = 24; }
+        doc.text(kiLines[q], margin, y);
+        y += 5;
+      }
+      y += 2;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(60, 60, 60);
+      var text = answers[i] ? answers[i] : '(står åpent)';
+      var lines = doc.splitTextToSize(text, maxWidth);
+      for (var j = 0; j < lines.length; j++){
+        if (y > pageBottom){ doc.addPage(); y = 24; }
+        doc.text(lines[j], margin, y);
+        y += 6;
+      }
+      y += 8;
+    }
+
+    doc.save('design-for-laering-med-ki-plan.pdf');
+  }
+
+  function downloadAsTxt(){
+    var lines = ['Design for læring med KI — vår plan'];
+    if (moduleName.trim() !== ''){ lines.push('Fag og tema: ' + moduleName.trim()); }
+    lines.push('Basert på Selander & Kress (2010)', '');
+    for (var i = 0; i < steps.length; i++){
+      var s = steps[i];
+      lines.push(s.kicker + ' — ' + s.title);
+      lines.push('KI: ' + s.ki);
+      lines.push(answers[i] ? answers[i] : '(står åpent)');
+      lines.push('');
+    }
+    var blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'design-for-laering-med-ki-plan.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /* ============ Tegning av steget ============ */
+  function render(){
+    renderTrack();
+    var isSummary = (current === steps.length);
+
+    if (isSummary){
+      cardEl.style.setProperty('--c', 'var(--dark)');
+      cardEl.style.setProperty('--c-soft', 'var(--hair)');
+      kickerEl.textContent = 'Samlet';
+      kickerEl.style.display = 'inline-block';
+      titleEl.textContent = 'Deres plan, samlet';
+      descEl.textContent = 'Slik ser hele forløpet ut, fra ramme til tegn på læring.';
+      inputArea.innerHTML = '';
+      renderSummary();
+      summaryArea.style.display = 'block';
+      prevBtn.disabled = false;
+      nextBtn.style.display = 'none';
+      return;
+    }
+
+    var s = steps[current];
+    cardEl.style.setProperty('--c', 'var(--' + s.phase + ')');
+    cardEl.style.setProperty('--c-soft', 'var(--' + s.phase + '-soft)');
+
+    kickerEl.style.display = 'inline-block';
+    kickerEl.textContent = s.kicker;
+    titleEl.textContent = s.title;
+    descEl.textContent = s.desc;
+    summaryArea.style.display = 'none';
+    summaryArea.innerHTML = '';
+
+    inputArea.innerHTML = '';
+    var promptEl = document.createElement('p');
+    promptEl.className = 'prompt';
+    promptEl.id = 'promptText';
+    promptEl.textContent = s.prompt;
+
+    var ta = document.createElement('textarea');
+    ta.placeholder = s.placeholder;
+    ta.setAttribute('aria-labelledby', 'promptText');
+    ta.value = answers[current] ? answers[current] : '';
+    /* Bind svaret til dette steget, slik at teksten havner riktig
+       også hvis steget byttes mens feltet står åpent. */
+    (function(stepIndex){
+      ta.addEventListener('input', function(){
+        answers[stepIndex] = ta.value;
+        saveSoon();
+        renderTrack();
+      });
+    })(current);
+
+    var kiBox = document.createElement('div');
+    kiBox.className = 'ki-box';
+    var kiLabel = document.createElement('span');
+    kiLabel.className = 'ki-label';
+    kiLabel.textContent = 'Med KI i rommet';
+    var kiText = document.createElement('p');
+    kiText.className = 'ki-text';
+    kiText.textContent = s.ki;
+    kiBox.appendChild(kiLabel);
+    kiBox.appendChild(kiText);
+
+    inputArea.appendChild(promptEl);
+    inputArea.appendChild(kiBox);
+    inputArea.appendChild(ta);
+
+    prevBtn.disabled = (current === 0);
+    nextBtn.style.display = 'block';
+    nextBtn.textContent = (current === steps.length - 1) ? 'Se planen' : 'Neste';
+  }
+
+  moduleInput.addEventListener('input', function(){
+    moduleName = moduleInput.value;
+    saveSoon();
+  });
+
+  function showCard(){ try{ cardEl.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ cardEl.scrollIntoView(); } }
+  prevBtn.addEventListener('click', function(){ if (current > 0){ current--; render(); showCard(); } });
+  nextBtn.addEventListener('click', function(){ if (current < totalSteps - 1){ current++; render(); showCard(); } });
+
+  restartBtn.addEventListener('click', function(){
+    if (!confirm('Dette sletter alt dere har skrevet på denne enheten. Er dere sikre?')) return;
+    answers = {};
+    moduleName = "";
+    moduleInput.value = "";
+    clearSaved();
+    current = 0;
+    render();
+  });
+
+  loadSaved();
+  moduleInput.value = moduleName;
+  render();
+</script>
+</body>
+</html>

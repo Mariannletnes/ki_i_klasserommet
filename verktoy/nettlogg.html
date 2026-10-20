@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prosesslogg på nett — Når KI er i rommet</title>
+<meta name="description" content="Prosesslogg i åtte faser for skapende prosjekter, med fire spor i hver fase: alene, i gruppa, med KI og visuelt. Lagres som fil og lastes ned som PDF.">
+<meta name="theme-color" content="#1E2A45">
+<link rel="icon" type="image/svg+xml" href="../ikon.svg">
+<link rel="stylesheet" href="verktoy.css">
+<script src="../js/jspdf.umd.min.js"></script>
+<style>
+
+/* ============ Tokens ============ */
+:root{
+  --paper:#FBF9F7;
+  --stone:#EDE7E2;
+  --surface:#FFFFFF;
+  --dark:#332830;
+  --plum:#6E4B57;
+  --ink:#4A3C43;
+  --body:#5E4F55;
+  --quiet:#7E6F74;
+  --hair:#E6DDD6;
+  --hair-stone:#DBD1C9;
+  --shadow:0 18px 40px rgba(51,40,48,.08);
+
+  /* De fire fasene i modellen. Turkis og oransje er de samme
+     som de to transformasjonssyklusene har i presentasjonen. */
+  --start:#6E4B57;  --start-soft:#F4EDEF;
+  --c1:#1B8283;     --c1-soft:#E2F3F1;
+  --c2:#B85C1A;     --c2-soft:#FCEBDC;
+  --all:#6E51A0;    --all-soft:#F0EBF8;
+}
+
+/* ============ Grunnlag ============ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  color:var(--body);
+  font-family:var(--sans);
+  font-size:1.05rem;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
+h1,h2,h3,p{margin:0}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit}
+:focus-visible{outline:2px solid var(--plum);outline-offset:3px}
+
+.wrap{max-width:780px;margin-inline:auto;width:100%;padding-inline:24px}
+
+/* ============ Innledning og modulfelt ============ */
+.intro{
+  margin-top:18px;
+  padding:22px 24px;
+  background:var(--surface);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+}
+.intro-h1-unused{
+  font-family:var(--serif);
+  font-weight:300;
+  font-size:clamp(1.9rem,4.4vw,2.5rem);
+  line-height:1.1;
+  color:var(--ink);
+  margin-bottom:8px;
+}
+.intro p{font-size:1.02rem;line-height:1.6}
+
+.module-row{
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--hair);
+}
+.module-row label{
+  display:block;
+  font-size:.86rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:500;
+  color:var(--plum);
+  margin-bottom:7px;
+}
+.module-row input{
+  width:100%;
+  padding:13px 15px;
+  background:var(--paper);
+  color:var(--ink);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  font-size:1.02rem;
+}
+.module-row input::placeholder{color:var(--quiet)}
+
+/* ============ Framdriftssporet ============ */
+.track{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:14px;
+  margin-bottom:24px;
+}
+.phase{--c:var(--plum)}
+.phase-name{
+  display:block;
+  font-size:.68rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:500;
+  color:var(--c);
+  margin-bottom:6px;
+  white-space:nowrap;
+}
+.segs{display:flex;gap:5px}
+.seg{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:1.5px solid var(--c);
+  background:transparent;
+  color:var(--c);
+  font-size:.82rem;
+  padding:0;
+  transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+}
+.seg.filled{background:var(--c);color:#fff}
+.seg.current{box-shadow:0 0 0 3px var(--c-soft)}
+.seg-plan{
+  width:auto;
+  padding:0 14px;
+  border-radius:999px;
+  font-size:.8rem;
+  letter-spacing:.04em;
+}
+
+/* ============ Kortet ============ */
+main{flex:1;padding-bottom:16px}
+.card{
+  margin-top:18px;
+  padding:clamp(24px,4vw,38px);
+  background:var(--surface);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  border-top:6px solid var(--c, var(--plum));
+}
+
+.kicker{
+  display:inline-block;
+  font-size:.74rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:500;
+  color:var(--c);
+  background:var(--c-soft);
+  padding:5px 12px;
+  border-radius:999px;
+  margin-bottom:12px;
+}
+.step-title{
+  font-family:var(--serif);
+  font-weight:300;
+  font-size:clamp(1.7rem,4.4vw,2.35rem);
+  line-height:1.12;
+  color:var(--ink);
+  margin-bottom:14px;
+}
+.step-desc{
+  font-size:1.05rem;
+  line-height:1.65;
+  margin-bottom:22px;
+  max-width:62ch;
+}
+.prompt{
+  font-size:1.06rem;
+  color:var(--ink);
+  font-weight:500;
+  line-height:1.5;
+  margin-bottom:12px;
+  max-width:62ch;
+}
+textarea{
+  width:100%;
+  min-height:170px;
+  padding:16px 18px;
+  background:var(--paper);
+  color:var(--ink);
+  border:1px solid var(--hair);
+  border-radius:var(--radius-lg);
+  font-size:1.05rem;
+  line-height:1.6;
+  resize:vertical;
+  transition:border-color .16s ease;
+}
+textarea:focus{border-color:var(--c)}
+textarea::placeholder{color:var(--quiet)}
+
+/* ============ KI-spørsmålet ============ */
+.ki-box{
+  margin:0 0 16px;
+  padding:14px 16px;
+  background:var(--all-soft);
+  border-radius:var(--radius-lg);
+  max-width:62ch;
+}
+.ki-label{
+  display:block;
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:500;
+  color:var(--all);
+  margin-bottom:4px;
+}
+.ki-text{font-size:1rem;line-height:1.55;color:var(--ink)}
+
+/* ============ Oppsummeringen ============ */
+.plan-list{list-style:none;padding:0;margin:0}
+.plan-item{
+  width:100%;
+  text-align:left;
+  display:block;
+  padding:16px 18px;
+  margin-bottom:10px;
+  background:var(--paper);
+  border:1px solid var(--hair);
+  border-left:5px solid var(--c);
+  border-radius:0 16px 16px 0;
+  transition:background .16s ease;
+}
+.plan-item:hover{background:var(--c-soft)}
+.plan-kicker{
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:500;
+  color:var(--c);
+  margin-bottom:3px;
+}
+.plan-title{
+  font-family:var(--serif);
+  font-weight:300;
+  font-size:1.28rem;
+  color:var(--ink);
+  margin-bottom:5px;
+}
+.plan-answer{font-size:1rem;line-height:1.55;white-space:pre-wrap;color:var(--body)}
+.plan-empty{font-size:1rem;color:var(--quiet);font-style:italic}
+
+.count{
+  font-size:.95rem;
+  color:var(--quiet);
+  margin-bottom:16px;
+}
+.summary-note{
+  font-size:.94rem;
+  color:var(--quiet);
+  margin-top:20px;
+  line-height:1.6;
+}
+.download-btn{
+  margin-top:16px;
+  background:var(--dark);
+  color:#F7F1F2;
+  border:none;
+  font-size:1.02rem;
+  padding:15px 28px;
+  border-radius:var(--radius-sm);
+  transition:background .2s ease;
+}
+.download-btn:hover{background:var(--ink)}
+
+/* ============ Navigasjon ============ */
+.nav-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:26px;
+  gap:16px;
+}
+.btn-next{
+  flex:1;
+  background:var(--dark);
+  color:#F7F1F2;
+  border:none;
+  font-size:1.04rem;
+  padding:16px 30px;
+  border-radius:var(--radius-sm);
+  text-align:center;
+  transition:background .2s ease;
+}
+.btn-next:hover{background:var(--ink)}
+.btn-prev{
+  background:transparent;
+  border:none;
+  color:var(--quiet);
+  font-size:1.02rem;
+  padding:16px 6px;
+}
+.btn-prev:disabled{opacity:0;pointer-events:none}
+.btn-prev:not(:disabled):hover{color:var(--plum)}
+
+/* ============ Lagring ============ */
+.footer-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  padding-top:18px;
+  padding-bottom:36px;
+  font-size:.92rem;
+  color:var(--quiet);
+}
+.saved{display:flex;align-items:center;gap:8px}
+.saved-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--hair-stone);
+  transition:background .3s ease;
+}
+.saved.on .saved-dot{background:#4F7D72}
+.restart{
+  background:none;
+  border:none;
+  padding:0 0 2px;
+  color:var(--quiet);
+  font-size:.92rem;
+  box-shadow:inset 0 -1px 0 var(--hair-stone);
+}
+.restart:hover{color:var(--plum);box-shadow:inset 0 -1px 0 var(--plum)}
+
+/* ============ Mobil ============ */
+@media (max-width:620px){
+  .wrap{padding-inline:16px}
+  .phase-name{display:none}
+  .track{gap:9px 11px;align-items:center}
+  .seg{width:26px;height:26px;font-size:.78rem}
+  /* Må gjenta bredden her, ellers klipper regelen over «Plan»-teksten. */
+  .seg-plan{width:auto;height:26px;padding:0 13px;font-size:.74rem}
+  .card{border-radius:var(--radius-lg)}
+  textarea{min-height:150px}
+}
+
+/* ============ Redusert bevegelse ============ */
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important}
+}
+
+/* ============ Loggens fire spor ============ */
+:root{
+  --alone:#1B8283; --alone-soft:#E2F3F1;
+  --group:#9A7400; --group-soft:#FBF1D6;
+  --ki:#6E51A0;    --ki-soft:#F0EBF8;
+  --vis:#B85C1A;   --vis-soft:#FCEBDC;
+}
+.order-note{
+  margin-top:14px;
+  font-size:.95rem;
+  color:var(--quiet);
+}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-top:16px}
+.fields label{display:block;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;font-weight:500;color:var(--plum);margin-bottom:6px}
+.fields input{width:100%;padding:12px 14px;background:var(--paper);color:var(--ink);border:1px solid var(--hair);border-radius:var(--radius-lg);font-size:1rem}
+.fields .wide{grid-column:1 / -1}
+.lane{
+  margin-top:18px;
+  padding:18px 18px 16px;
+  border-radius:var(--radius-lg);
+  background:var(--lane-soft);
+}
+.lane-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.lane-num{
+  width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--lane);color:#fff;font-size:.82rem;font-weight:500;flex:none;
+}
+.lane-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;font-weight:500;color:var(--lane)}
+.lane-prompt{font-size:1.02rem;color:var(--ink);line-height:1.5;margin-bottom:10px;max-width:62ch}
+.lane textarea{min-height:110px;background:#fff}
+.lane textarea:focus{border-color:var(--lane)}
+.sub-label{display:block;font-size:.92rem;color:var(--ink);font-weight:500;margin:10px 0 6px}
+.sub-label:first-of-type{margin-top:0}
+.lane .small{min-height:70px}
+.img-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.thumb{position:relative;width:110px;height:82px;border-radius:12px;overflow:hidden;border:1px solid var(--hair)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb button{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(51,40,48,.75);color:#fff;font-size:.9rem;line-height:1;padding:0}
+.add-img{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:10px;padding:9px 16px;border-radius:999px;
+  border:1.5px dashed var(--lane);background:transparent;color:var(--lane);font-size:.95rem;
+}
+.add-img input{display:none}
+.img-note{font-size:.85rem;color:var(--quiet);margin-top:6px}
+.sum-phase{margin-bottom:14px;padding:16px 18px;background:var(--paper);border:1px solid var(--hair);border-radius:var(--radius-lg)}
+.sum-phase h3{font-family:var(--serif);font-weight:300;font-size:1.3rem;color:var(--ink);margin-bottom:8px}
+.sum-row{margin-bottom:8px}
+.sum-k{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+.sum-v{font-size:.98rem;white-space:pre-wrap;color:var(--body)}
+.sum-empty{font-size:.95rem;color:var(--quiet);font-style:italic}
+/* ============ Filer og fase-nedlasting ============ */
+.file-box{
+  margin-top:16px;padding:14px 16px;border-radius:var(--radius-lg);
+  background:var(--paper);border:1px solid var(--hair);
+}
+.file-box p{font-size:.95rem;line-height:1.55;margin-bottom:10px}
+.file-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn-soft{
+  background:#fff;color:var(--ink);border:1.5px solid var(--ink);
+  font-size:.95rem;padding:10px 18px;border-radius:var(--radius-sm);
+}
+.btn-soft:hover{background:var(--ink);color:#fff}
+.btn-soft input{display:none}
+.file-status{font-size:.88rem;color:var(--quiet)}
+.phase-dl{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+@media (max-width:620px){ .fields{grid-template-columns:1fr} .lane{padding:16px 14px} }
+
+/* ============ Sidens farger (overstyrer verdiene over) ============ */
+:root{
+  --paper:var(--cream); --stone:var(--lin); --surface:#fff; --dark:var(--marine);
+  --plum:var(--mauve-ink); --ink:var(--text); --body:var(--text-soft); --quiet:var(--text-pale);
+  --hair:var(--lin-dark); --hair-stone:var(--lin-dark);
+  --shadow:0 12px 36px rgba(30,42,69,.08);
+
+  /* fasene i modellen: de to transformasjonssyklusene har samme farger som i presentasjonen, dempet */
+  --start:#B07A93; --start-soft:#F3E8ED;
+  --c1:#3F7470;    --c1-soft:#E3EEEC;
+  --c2:#A8603A;    --c2-soft:#F5E8DF;
+  --all:#1E2A45;   --all-soft:#E6E9F1;
+
+  /* de fire sporene i nettloggen */
+  --alone:#34497A; --alone-soft:#E6E9F1;
+  --group:#9A7B4F; --group-soft:#F2ECE2;
+  --ki:#7E4A62;    --ki-soft:#F3E8ED;
+  --vis:#3F7470;   --vis-soft:#E3EEEC;
+}
+body{background:var(--cream);color:var(--text-soft)}
+:focus-visible{outline:2px solid var(--mauve);outline-offset:3px}
+
+/* ============ Felles for stegverktøyene ============ */
+.tool-wrap{max-width:820px;margin-inline:auto;width:100%;padding-inline:24px}
+.tool-intro{margin-top:-2.2rem;position:relative;z-index:2;padding:22px 24px;background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+.tool-intro > p{font-size:1.02rem;line-height:1.65;color:var(--text-soft);margin:0}
+.tool-intro > p + p{margin-top:.6rem}
+.tool-source{font-size:.85rem!important;color:var(--text-pale)!important}
+#card{scroll-margin-top:80px}
+@media (max-width:720px){#card{scroll-margin-top:12px}}
+@media (max-width:620px){.tool-wrap{padding-inline:16px}.tool-intro{margin-top:-1.6rem}}
+
+</style>
+</head>
+<body>
+<a class="skip" href="#innhold">Hopp til innholdet</a>
+
+<nav class="site-nav" aria-label="Hovedmeny">
+  <div class="nav-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <ul class="nav-links">
+      <li><a href="../bolk-1-engasjement.html">Engasjement</a></li>
+      <li><a href="../bolk-2-elevstemmer.html">Elevstemmer</a></li>
+      <li><a href="../bolk-3-design.html">Design</a></li>
+      <li><a href="../bolk-4-vurdering.html">Vurdering</a></li>
+      <li><a href="../index.html#verktoy" aria-current="page">Verktøy</a></li>
+      <li><a href="https://mariannletnes.com" class="sub">Mari-Ann Letnes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="v-hero">
+  <div class="v-hero-inner">
+    <p class="v-crumb"><a href="../index.html#verktoy">← Alle verktøy</a></p>
+    <p class="v-kicker">Prosesslogg · Verktøy</p>
+    <h1>Prosesslogg <em>på nett</em></h1>
+    <p class="v-desc">Loggen følger et skapende prosjekt gjennom åtte faser, fra oppgaven til ferdig produkt. Produktet kan være en podkast, en film, en nettavis, en utstilling eller noe annet. Bygd på prosessloggen i forskningsprosjektet «Å lære med maskiner».</p>
+  </div>
+</header>
+
+<div class="wrap tool-wrap">
+  <div class="intro tool-intro">
+    <p>I hver fase skriver du i fire spor: hva du tenker alene, hva gruppa kommer fram til, hvordan dere bruker KI, og hva dere viser visuelt. Skriv kort. Stikkord holder.</p>
+    <p class="order-note">Rekkefølgen er bevisst: Tenk alene først, så i gruppa, så med KI.</p>
+    <div class="fields">
+      <div><label for="fName">Navn</label><input id="fName" placeholder="Fornavn"></div>
+      <div><label for="fGroup">Gruppe</label><input id="fGroup" placeholder="For eksempel: Gruppe 3"></div>
+      <div class="wide"><label for="fProject">Fag, prosjekt og mottaker</label><input id="fProject" placeholder="For eksempel: Samfunnskunnskap vg1, nettavis om valget"></div>
+    </div>
+    <div class="file-box">
+      <p><strong>Lagre loggen som fil etter hver økt.</strong> Nettleseren husker loggen på denne maskinen. Legg filen i OneDrive eller Teams, og åpne den igjen neste gang, på hvilken som helst maskin.</p>
+      <div class="file-row">
+        <button class="btn-soft" type="button" id="saveFileBtn">Lagre loggen som fil</button>
+        <label class="btn-soft" id="openFileLbl">Åpne lagret logg<input type="file" id="openFile" accept=".json,application/json"></label>
+        <span class="file-status" id="fileStatus"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap tool-wrap" id="innhold">
+  <div class="card" id="card">
+    <div class="track" id="track" role="group" aria-label="Faser i loggen"></div>
+    <p class="kicker" id="stepKicker"></p>
+    <h2 class="step-title" id="stepTitle"></h2>
+    <p class="step-desc" id="stepDesc"></p>
+    <div id="inputArea"></div>
+    <div id="summaryArea"></div>
+    <div class="nav-row">
+      <button class="btn-prev" type="button" id="prevBtn">Forrige</button>
+      <button class="btn-next" type="button" id="nextBtn">Neste</button>
+    </div>
+  </div>
+</main>
+
+<div class="footer-row wrap tool-wrap">
+  <span class="saved" id="saved"><span class="saved-dot" aria-hidden="true"></span><span id="savedText">Lagres midlertidig i nettleseren</span></span>
+  <button class="restart" type="button" id="restartBtn">Tøm og start på nytt</button>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <p class="footer-info">
+      Mari-Ann Letnes &nbsp;·&nbsp; Institutt for lærerutdanning, NTNU &nbsp;·&nbsp; <a href="mailto:mari.ann.letnes@ntnu.no">mari.ann.letnes@ntnu.no</a><br>
+      Elevstemmene er fiktive &nbsp;·&nbsp; <a href="https://mariannletnes.com">mariannletnes.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  /* ============================================================
+     De fire sporene i loggen. Fargene brukes på hvert felt.
+     ============================================================ */
+  var LANES = {
+    alone: { title:"Alene", color:"var(--alone)", soft:"var(--alone-soft)" },
+    group: { title:"Gruppa", color:"var(--group)", soft:"var(--group-soft)" },
+    ki:    { title:"Bruk av KI", color:"var(--ki)", soft:"var(--ki-soft)" },
+    vis:   { title:"Visuell dokumentasjon", color:"var(--vis)", soft:"var(--vis-soft)" }
+  };
+  var KI3 = [
+    { key:"kiAsk", label:"Hva spør dere KI om?" },
+    { key:"kiAnswer", label:"Hva svarer KI? (kort)" },
+    { key:"kiThink", label:"Hva synes dere om svaret, og hvordan sjekket dere det?" }
+  ];
+
+  /* Fasene fra loggen i syklus 2. Hver fase har felt i rekkefølge. */
+  var phases = [
+    { title:"Å gjøre seg kjent med oppgaven", desc:"Start med å forstå hva oppgaven ber dere om, før dere begynner å lete etter svar.",
+      lanes:[
+        { lane:"alone", prompt:"Hva går denne oppgaven ut på? Hva ber oppgaveteksten meg om å gjøre?" },
+        { lane:"group", prompt:"Diskuter oppgaveteksten. Skriv ned hva dere tenker at oppgaven handler om." },
+        { lane:"ki", prompt:"Bruk KI for å forstå oppgaven.", ki3:true },
+        { lane:"vis", prompt:"Lag en oversikt over oppgaven som dere tegner ut.", img:true }
+      ]},
+    { title:"Informasjonsinnhenting", desc:"Finn ut hva dere trenger å vite, hvor dere finner det, og hvordan dere sjekker at det stemmer.",
+      lanes:[
+        { lane:"alone", prompt:"Hva trenger jeg av informasjon for å forstå temaet bedre? Hva skal produktet vårt handle om? Hvilken sjanger eller form ønsker jeg? Se gjerne på eksempler. Skriv i punkter." },
+        { lane:"group", prompt:"Hvor skal vi samle informasjon, og hvordan organiserer vi den? Hvordan sikrer vi at informasjonen stemmer? Skriv ned hva gruppa kommer fram til." },
+        { lane:"ki", prompt:"Hvordan kan KI hjelpe oss med å hente inn informasjon? Henter vi også informasjon fra andre kilder, og i så fall hvilke?", ki3:true },
+        { lane:"vis", prompt:"Skjermbilder av KI-samtaler, oversikt over kilder, tankekart.", img:true }
+      ]},
+    { title:"Idéutvikling", desc:"Nå skal dere finne fram til ideer og vinkling. Alle ideer er velkomne i denne fasen.",
+      lanes:[
+        { lane:"alone", prompt:"Hvilke ideer har jeg selv, før vi diskuterer i gruppa?" },
+        { lane:"group", prompt:"Hva er gruppas ideer? Hvordan kan vi gjøre produktet engasjerende for mottakeren? Tenk på tittel, åpning, oppbygging og avslutning." },
+        { lane:"ki", prompt:"Hvordan kan KI hjelpe oss med ideer?", ki3:true },
+        { lane:"vis", title:"Infografikk", prompt:"Tankekart, skisser av ideer og notater fra idémyldring.", img:true }
+      ]},
+    { title:"Løsningsutvikling", desc:"Velg løsning og fordel arbeidet. Tenk på hvordan dere vil overbevise og engasjere.",
+      lanes:[
+        { lane:"alone", prompt:"Hvilken måte å formidle temaet på virker mest lovende, og hvorfor? Hva kan jeg bidra med?" },
+        { lane:"group", prompt:"Hvilken løsning mener vi er mest realistisk og engasjerende for mottakeren vår? Hvordan fordeler vi arbeidet?" },
+        { lane:"ki", prompt:"Hva kan KI hjelpe oss med når vi utformer løsningen?", ki3:true },
+        { lane:"vis", title:"Virkemidler", prompt:"Hvilke virkemidler vil vi bruke for å nå mottakeren, for eksempel språk, bilder, lyd eller appellformer, og hvorfor?" }
+      ]},
+    { title:"Plan for produktet", desc:"Lag planen for selve produktet: et manus, en dreiebok, en disposisjon eller en skisse. Bestem hvem som gjør hva.",
+      lanes:[
+        { lane:"group", title:"Planen", prompt:"Manus, dreiebok, disposisjon eller skisse. Hva kommer først, i midten og til slutt?", big:true },
+        { lane:"group", title:"Hvem gjør hva", prompt:"Fordel roller og oppgaver i gruppa." }
+      ]},
+    { title:"Produksjon", desc:"Lag produktet, prøv det ut og juster. Forstår noen utenfor gruppa det dere vil si, er dere på god vei.",
+      lanes:[
+        { lane:"alone", prompt:"Prøv din del på noen utenfor gruppa, for eksempel et familiemedlem. Skjønte de hva du mente? Hva endret du etterpå?" },
+        { lane:"group", prompt:"Hvordan gjennomførte vi produksjonen? Hva justerte vi underveis? Prioriter det som betyr mest for mottakeren, og la småfeil ligge." },
+        { lane:"ki", prompt:"Hva kunne KI hjelpe oss med i produksjonen?", ki3:true },
+        { lane:"vis", prompt:"Bilder fra produksjonen, skjermbilder eller skisser.", img:true }
+      ]},
+    { title:"Tilbakeblikk", desc:"Se tilbake på hvordan arbeidet gikk, både for deg og for gruppa.",
+      lanes:[
+        { lane:"alone", prompt:"Hvordan gikk gjennomføringen og arbeidsfordelingen? Hva kunne vært gjort annerledes?" },
+        { lane:"group", prompt:"Hvordan vurderer vi som gruppe arbeidet vårt? Hva er vi mest fornøyd med, og hva er vi minst fornøyd med?" },
+        { lane:"ki", prompt:"Hvordan har KI hjulpet oss med å lage produktet? Hvordan hadde det vært uten KI?" },
+        { lane:"vis", prompt:"Legg ved det som viser prosessen best.", img:true }
+      ]},
+    { title:"Refleksjon over egen læring", desc:"Til slutt: Hva har du lært, og hvordan lærte du det?",
+      lanes:[
+        { lane:"alone", prompt:"Hva lærte du av å jobbe alene?" },
+        { lane:"group", prompt:"Hvordan var det å lære når dere diskuterte sammen i gruppa?" },
+        { lane:"ki", prompt:"Hvordan var det å lære når du eller dere «snakket» med KI? Hjalp KI deg til å forstå, eller kom KI i veien?" },
+        { lane:"vis", prompt:"Legg ved noe som viser hva du har forstått.", img:true }
+      ]}
+  ];
+
+  var data = { meta:{name:"",group:"",project:""}, ans:{}, imgs:{} };
+  var current = 0;
+  var totalSteps = phases.length + 1;
+  var MAX_IMG = 4;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var cardEl=$('card'), trackEl=$('track'), kickerEl=$('stepKicker'), titleEl=$('stepTitle'), descEl=$('stepDesc'),
+      inputArea=$('inputArea'), summaryArea=$('summaryArea'), prevBtn=$('prevBtn'), nextBtn=$('nextBtn'),
+      savedEl=$('saved'), savedText=$('savedText');
+
+  /* ============ Lagring i nettleseren ============ */
+  var STORE_KEY='prosesslogg-med-ki-v1', saveTimer=null, flashTimer=null;
+  function loadSaved(){
+    try{
+      var raw=localStorage.getItem(STORE_KEY); if(!raw) return;
+      var d=JSON.parse(raw);
+      if(d && d.meta) data.meta=d.meta;
+      if(d && d.ans) data.ans=d.ans;
+      if(d && d.imgs) data.imgs=d.imgs;
+    }catch(e){}
+  }
+  function saveSoon(){ if(saveTimer) clearTimeout(saveTimer); saveTimer=setTimeout(saveNow,400); }
+  function saveNow(){
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+      savedEl.classList.add('on'); savedText.textContent='Lagret';
+      if(flashTimer) clearTimeout(flashTimer);
+      flashTimer=setTimeout(function(){ savedEl.classList.remove('on'); savedText.textContent='Lagres midlertidig i nettleseren'; },1600);
+    }catch(e){
+      savedText.textContent='Nettleseren er full. Fjern et bilde, eller last ned loggen nå.';
+    }
+  }
+  function key(p,i,sub){ return p+'-'+i+(sub?'-'+sub:''); }
+  function val(k){ return data.ans[k] || ''; }
+  function phaseFilled(p){
+    for(var k in data.ans){ if(k.indexOf(p+'-')===0 && (data.ans[k]||'').trim()!=='') return true; }
+    for(var j in data.imgs){ if(j.indexOf(p+'-')===0 && data.imgs[j].length) return true; }
+    return false;
+  }
+
+  /* ============ Framdriftssporet ============ */
+  function renderTrack(){
+    trackEl.innerHTML='';
+    var g=document.createElement('div'); g.className='phase';
+    g.style.setProperty('--c','var(--plum)'); g.style.setProperty('--c-soft','var(--start-soft)');
+    var n=document.createElement('span'); n.className='phase-name'; n.textContent='Faser'; g.appendChild(n);
+    var segs=document.createElement('div'); segs.className='segs';
+    phases.forEach(function(ph,i){
+      var b=document.createElement('button'); b.type='button';
+      var f=phaseFilled(i);
+      b.className='seg'+(f?' filled':'')+(i===current?' current':'');
+      b.textContent=i+1;
+      b.setAttribute('aria-label','Fase '+(i+1)+': '+ph.title+(f?' — påbegynt':' — tom'));
+      if(i===current) b.setAttribute('aria-current','step');
+      b.addEventListener('click',function(){ current=i; render(); });
+      segs.appendChild(b);
+    });
+    g.appendChild(segs); trackEl.appendChild(g);
+    var l=document.createElement('div'); l.className='phase';
+    l.style.setProperty('--c','var(--dark)'); l.style.setProperty('--c-soft','var(--hair)');
+    var ln=document.createElement('span'); ln.className='phase-name'; ln.textContent='Samlet'; l.appendChild(ln);
+    var s2=document.createElement('div'); s2.className='segs';
+    var pb=document.createElement('button'); pb.type='button';
+    pb.className='seg seg-plan'+(current===phases.length?' filled current':'');
+    pb.textContent='Loggen'; pb.setAttribute('aria-label','Se hele loggen');
+    pb.addEventListener('click',function(){ current=phases.length; render(); });
+    s2.appendChild(pb); l.appendChild(s2); trackEl.appendChild(l);
+  }
+
+  /* ============ Bilder ============ */
+  function compress(file, cb){
+    var r=new FileReader();
+    r.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var max=1100, w=im.width, h=im.height, sc=Math.min(1, max/Math.max(w,h));
+        var c=document.createElement('canvas'); c.width=Math.round(w*sc); c.height=Math.round(h*sc);
+        var ctx=c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(im,0,0,c.width,c.height);
+        cb(c.toDataURL('image/jpeg',0.72), c.width, c.height);
+      };
+      im.onerror=function(){ cb(null); };
+      im.src=r.result;
+    };
+    r.readAsDataURL(file);
+  }
+  function imgBlock(k, wrap){
+    var row=document.createElement('div'); row.className='img-row';
+    (data.imgs[k]||[]).forEach(function(im,idx){
+      var t=document.createElement('div'); t.className='thumb';
+      var i=document.createElement('img'); i.src=im.src; i.alt='Bilde '+(idx+1);
+      var x=document.createElement('button'); x.type='button'; x.textContent='×'; x.setAttribute('aria-label','Fjern bilde '+(idx+1));
+      x.addEventListener('click',function(){ data.imgs[k].splice(idx,1); saveNow(); render(); });
+      t.appendChild(i); t.appendChild(x); row.appendChild(t);
+    });
+    wrap.appendChild(row);
+    if((data.imgs[k]||[]).length < MAX_IMG){
+      var lab=document.createElement('label'); lab.className='add-img';
+      lab.appendChild(document.createTextNode('+ Legg til bilde'));
+      var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+      inp.addEventListener('change',function(){
+        var f=inp.files && inp.files[0]; if(!f) return;
+        compress(f,function(src,w,h){
+          if(!src) return;
+          data.imgs[k]=data.imgs[k]||[]; data.imgs[k].push({src:src,w:w,h:h});
+          saveNow(); render();
+        });
+      });
+      lab.appendChild(inp); wrap.appendChild(lab);
+    }
+    var note=document.createElement('p'); note.className='img-note';
+    note.textContent='Bilder, skjermbilder eller foto av tegninger. Høyst '+MAX_IMG+' per fase.';
+    wrap.appendChild(note);
+  }
+
+  /* ============ Felt ============ */
+  function textarea(k, cls){
+    var ta=document.createElement('textarea'); if(cls) ta.className=cls;
+    ta.value=val(k); ta.placeholder='Skriv kort …';
+    ta.addEventListener('input',function(){ data.ans[k]=ta.value; saveSoon(); renderTrack(); });
+    return ta;
+  }
+  function laneEl(p, i, L, n){
+    var meta=LANES[L.lane];
+    var box=document.createElement('section'); box.className='lane';
+    box.style.setProperty('--lane',meta.color); box.style.setProperty('--lane-soft',meta.soft);
+    var head=document.createElement('div'); head.className='lane-head';
+    var num=document.createElement('span'); num.className='lane-num'; num.textContent=n;
+    var t=document.createElement('span'); t.className='lane-title'; t.textContent=L.title||meta.title;
+    head.appendChild(num); head.appendChild(t); box.appendChild(head);
+    var pr=document.createElement('p'); pr.className='lane-prompt'; pr.textContent=L.prompt; box.appendChild(pr);
+    if(L.ki3){
+      KI3.forEach(function(s){
+        var lab=document.createElement('label'); lab.className='sub-label'; lab.textContent=s.label;
+        var ta=textarea(key(p,i,s.key),'small'); lab.htmlFor=ta.id='f-'+key(p,i,s.key);
+        box.appendChild(lab); box.appendChild(ta);
+      });
+    } else {
+      var ta=textarea(key(p,i), L.big?'':''); if(L.big) ta.style.minHeight='260px';
+      ta.setAttribute('aria-label',(L.title||meta.title)+': '+L.prompt);
+      box.appendChild(ta);
+    }
+    if(L.img) imgBlock(key(p,i,'img'), box);
+    return box;
+  }
+
+  /* ============ Samlet logg ============ */
+  function laneTexts(p,i,L){
+    var out=[];
+    if(L.ki3){ KI3.forEach(function(s){ var v=val(key(p,i,s.key)); if(v.trim()) out.push(s.label+' '+v); }); }
+    else { var v=val(key(p,i)); if(v.trim()) out.push(v); }
+    return out;
+  }
+  function renderSummary(){
+    summaryArea.innerHTML='';
+    phases.forEach(function(ph,p){
+      var box=document.createElement('div'); box.className='sum-phase';
+      var h=document.createElement('h3'); h.textContent=(p+1)+'. '+ph.title; box.appendChild(h);
+      var any=false;
+      ph.lanes.forEach(function(L,i){
+        var meta=LANES[L.lane], txt=laneTexts(p,i,L), ims=data.imgs[key(p,i,'img')]||[];
+        if(!txt.length && !ims.length) return;
+        any=true;
+        var r=document.createElement('div'); r.className='sum-row';
+        var k=document.createElement('span'); k.className='sum-k'; k.style.color=meta.color; k.textContent=L.title||meta.title;
+        var v=document.createElement('span'); v.className='sum-v'; v.style.display='block'; v.textContent=txt.join('\n');
+        r.appendChild(k); r.appendChild(v);
+        if(ims.length){ var row=document.createElement('div'); row.className='img-row'; ims.forEach(function(im){ var t=document.createElement('div'); t.className='thumb'; var i2=document.createElement('img'); i2.src=im.src; i2.alt=''; t.appendChild(i2); row.appendChild(t); }); r.appendChild(row); }
+        box.appendChild(r);
+      });
+      if(!any){ var e=document.createElement('p'); e.className='sum-empty'; e.textContent='Står åpent.'; box.appendChild(e); }
+      box.addEventListener('click',function(ev){ if(ev.target.tagName!=='BUTTON'){ current=p; render(); showCard(); } });
+      box.style.cursor='pointer';
+      summaryArea.appendChild(box);
+    });
+    var note=document.createElement('p'); note.className='summary-note';
+    note.textContent='Husk å lagre loggen som fil (øverst på siden) etter hver økt. PDF-en er til innlevering og deling.';
+    summaryArea.appendChild(note);
+    var dl=document.createElement('button'); dl.type='button'; dl.className='download-btn'; dl.textContent='Last ned loggen (.pdf)';
+    dl.addEventListener('click',function(){ download(); }); summaryArea.appendChild(dl);
+  }
+
+  /* ============ Lagre og åpne fil ============ */
+  function slug(t){ return (t||'').toLowerCase().replace(/[æ]/g,'ae').replace(/[ø]/g,'o').replace(/[å]/g,'a').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  function today(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function fileBase(){ var n=slug(data.meta.name); return 'prosesslogg'+(n?'-'+n:''); }
+  function updateFileStatus(){
+    var el=$('fileStatus');
+    el.textContent = data.meta.lastFile ? 'Sist lagret som fil: '+data.meta.lastFile : 'Loggen er foreløpig lagret i nettleseren.';
+  }
+  function saveFile(){
+    var d=new Date();
+    data.meta.lastFile=today()+' kl. '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    saveNow(); updateFileStatus();
+    var out={ type:'prosesslogg-med-ki', version:1, saved:new Date().toISOString(), data:data };
+    var blob=new Blob([JSON.stringify(out)],{type:'application/json'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=fileBase()+'-'+today()+'.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
+  function openFile(file){
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var o=JSON.parse(r.result);
+        if(!o || o.type!=='prosesslogg-med-ki' || !o.data) throw new Error('feil');
+        var hasData=Object.keys(data.ans).some(function(k){ return (data.ans[k]||'').trim(); });
+        if(hasData && !confirm('Dette erstatter loggen som ligger i nettleseren nå med loggen fra filen. Vil du fortsette?')) return;
+        data={ meta:o.data.meta||{}, ans:o.data.ans||{}, imgs:o.data.imgs||{} };
+        $('fName').value=data.meta.name||''; $('fGroup').value=data.meta.group||''; $('fProject').value=data.meta.project||'';
+        saveNow(); updateFileStatus(); current=0; render();
+        $('fileStatus').textContent='Loggen er åpnet. Fortsett der du slapp.';
+      }catch(e){
+        $('fileStatus').textContent='Velg en loggfil som er lagret fra denne siden.';
+      }
+    };
+    r.readAsText(file);
+  }
+
+  /* ============ Nedlasting ============ */
+  function download(only){ if(window.jspdf && window.jspdf.jsPDF){ pdf(only); } else { txt(only); } }
+  function pdf(only){
+    var list = (typeof only==='number') ? [only] : phases.map(function(_,i){ return i; });
+    var doc=new window.jspdf.jsPDF(), m=18, W=doc.internal.pageSize.getWidth()-m*2, bottom=282, y=22;
+    function need(h){ if(y+h>bottom){ doc.addPage(); y=22; } }
+    function para(t,size,style,rgb,lead){
+      doc.setFont('helvetica',style||'normal'); doc.setFontSize(size); doc.setTextColor(rgb[0],rgb[1],rgb[2]);
+      doc.splitTextToSize(t,W).forEach(function(line){ need(lead); doc.text(line,m,y); y+=lead; });
+    }
+    para(typeof only==='number' ? 'Prosesslogg med KI · fase '+(only+1)+' av '+phases.length : 'Prosesslogg med KI',17,'bold',[20,20,20],8);
+    var meta=[data.meta.name,data.meta.group,data.meta.project].filter(function(s){return (s||'').trim();}).join(' · ');
+    if(meta) para(meta,11,'normal',[70,70,70],6);
+    para('Lastet ned '+today()+'. Bygd på prosessloggen i «Å lære med maskiner» (Letnes).',9,'normal',[120,120,120],5);
+    y+=6;
+    var col={alone:[27,130,131],group:[154,116,0],ki:[110,81,160],vis:[184,92,26]};
+    list.forEach(function(p){
+      var ph=phases[p];
+      need(16); para((p+1)+'. '+ph.title,13,'bold',[20,20,20],7); y+=1;
+      ph.lanes.forEach(function(L,i){
+        var t=laneTexts(p,i,L), ims=data.imgs[key(p,i,'img')]||[];
+        para((L.title||LANES[L.lane].title).toUpperCase(),8,'bold',col[L.lane],5);
+        if(t.length){ t.forEach(function(s){ para(s,10.5,'normal',[50,50,50],5.4); }); }
+        else if(!ims.length){ para('(står åpent)',10,'italic',[150,150,150],5); }
+        ims.forEach(function(im){
+          var w=Math.min(80,W), h=w*im.h/im.w; if(h>70){ h=70; w=h*im.w/im.h; }
+          need(h+3); try{ doc.addImage(im.src,'JPEG',m,y,w,h); }catch(e){} y+=h+3;
+        });
+        y+=3;
+      });
+      y+=4;
+    });
+    doc.save(fileBase()+(typeof only==='number' ? '-fase-'+(only+1) : '')+'.pdf');
+  }
+  function txt(only){
+    var list = (typeof only==='number') ? [only] : phases.map(function(_,i){ return i; });
+    var L=['Prosesslogg med KI', [data.meta.name,data.meta.group,data.meta.project].join(' · '), ''];
+    list.forEach(function(p){
+      var ph=phases[p];
+      L.push((p+1)+'. '+ph.title);
+      ph.lanes.forEach(function(ln,i){ L.push((ln.title||LANES[ln.lane].title)+':'); var t=laneTexts(p,i,ln); L.push(t.length?t.join('\n'):'(står åpent)'); });
+      L.push('');
+    });
+    var blob=new Blob([L.join('\n')],{type:'text/plain;charset=utf-8'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=fileBase()+(typeof only==='number' ? '-fase-'+(only+1) : '')+'.txt'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
+
+  /* ============ Tegning ============ */
+  function render(){
+    renderTrack();
+    if(current===phases.length){
+      cardEl.style.setProperty('--c','var(--dark)'); cardEl.style.setProperty('--c-soft','var(--hair)');
+      kickerEl.textContent='Samlet'; titleEl.textContent='Hele loggen'; descEl.textContent='Slik ser loggen ut så langt. Trykk på en fase for å gå tilbake og skrive mer.';
+      inputArea.innerHTML=''; renderSummary(); summaryArea.style.display='block';
+      prevBtn.disabled=false; nextBtn.style.display='none'; return;
+    }
+    var ph=phases[current];
+    cardEl.style.setProperty('--c','var(--plum)'); cardEl.style.setProperty('--c-soft','var(--start-soft)');
+    kickerEl.textContent='Fase '+(current+1)+' av '+phases.length;
+    titleEl.textContent=ph.title; descEl.textContent=ph.desc;
+    summaryArea.style.display='none'; summaryArea.innerHTML=''; inputArea.innerHTML='';
+    ph.lanes.forEach(function(L,i){ inputArea.appendChild(laneEl(current,i,L,i+1)); });
+    var pd=document.createElement('div'); pd.className='phase-dl';
+    var pb=document.createElement('button'); pb.type='button'; pb.className='btn-soft';
+    pb.textContent='Last ned fase '+(current+1)+' (.pdf)';
+    (function(p){ pb.addEventListener('click',function(){ download(p); }); })(current);
+    var ps=document.createElement('span'); ps.className='file-status'; ps.textContent='For eksempel når fasen skal leveres eller deles med læreren.';
+    pd.appendChild(pb); pd.appendChild(ps); inputArea.appendChild(pd);
+    prevBtn.disabled=(current===0); nextBtn.style.display='block';
+    nextBtn.textContent=(current===phases.length-1)?'Se hele loggen':'Neste fase';
+  }
+
+  [['fName','name'],['fGroup','group'],['fProject','project']].forEach(function(p){
+    var el=$(p[0]); el.addEventListener('input',function(){ data.meta[p[1]]=el.value; saveSoon(); });
+  });
+  function showCard(){ var c=document.getElementById('card'); try{ c.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){ c.scrollIntoView(); } }
+  prevBtn.addEventListener('click',function(){ if(current>0){ current--; render(); showCard(); } });
+  nextBtn.addEventListener('click',function(){ if(current<totalSteps-1){ current++; render(); showCard(); } });
+  $('restartBtn').addEventListener('click',function(){
+    if(!confirm('Dette sletter hele loggen på denne enheten. Er du sikker?')) return;
+    data={meta:{name:"",group:"",project:""},ans:{},imgs:{}};
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+    $('fName').value=''; $('fGroup').value=''; $('fProject').value=''; current=0; render();
+  });
+
+  $('saveFileBtn').addEventListener('click',saveFile);
+  $('openFile').addEventListener('change',function(){ var f=this.files && this.files[0]; if(f) openFile(f); this.value=''; });
+
+  loadSaved();
+  $('fName').value=data.meta.name||''; $('fGroup').value=data.meta.group||''; $('fProject').value=data.meta.project||'';
+  updateFileStatus();
+  render();
+</script>
+</body>
+</html>

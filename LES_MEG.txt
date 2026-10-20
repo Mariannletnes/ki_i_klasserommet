@@ -1,0 +1,47 @@
+Når KI er i rommet – ressursside fra fagdagen
+Mari-Ann Letnes · NTNU
+
+ÅPNE: Pakk ut mappen og dobbeltklikk index.html. Alle sidene virker lokalt, også uten nett.
+NETTPUBLISERING: Legg innholdet i mappen i GitHub-repoet, slik at index.html ligger øverst.
+
+MAPPESTRUKTUR
+  index.html                     Forsiden: de fire bolkene og verktøyene
+  bolk-1-engasjement.html        Bolk 1: Engasjement med KI-blikk
+  bolk-2-elevstemmer.html        Bolk 2: Elevenes stemmer, samtalen om støtte eller erstatning
+  bolk-3-design.html             Bolk 3: Design for læring, bygg og prøv en KI-agent
+  bolk-4-vurdering.html          Bolk 4: Vurdering, tegn på læring og metasamtalen
+  stil.css                       Felles stil for sidene øverst i mappen
+  ikon.svg                       Ikonet i nettleserfanen
+
+  verktoy/
+    verktoy.css                  Stilen til verktøyene, med samme farger, skrifter, meny og bunn
+    planlegging.html             Design for læring med KI, ni steg, med PDF-nedlasting
+    bygg-en-faseagent.html       Tilpass instruksen, lag agenten i Copilot og test den
+    prosesslogg-i-forms.html     Gruppelogg og fasenotat i Microsoft Forms
+    nettlogg.html                Prosesslogg på nett i åtte faser, med lagring som fil og PDF
+    refleksjon-engasjement.html  Refleksjonsoppgave: engasjement når KI er med, fire blikk og PDF
+    setningsveggen.html          De to TaskCards-tavlene med QR-koder, og tips til egen tavle
+
+  Filer/                         Til nedlasting
+    sitatkort-elevstemmer.pdf    48 fiktive elevstemmer i åtte fag, tosidig A4 (vend langs kortsiden)
+    snakk-og-bytt-ki.pdf         20 Snakk og bytt-kort om KI i klasserommet, tosidig A4
+    sorteringsark-a3.pdf         Fire felt til sitatsorteringen, A3 liggende
+    sorteringsark-a2-to-a3.pdf   Samme ark i A2, delt på to A3-ark som limes sammen
+    samtaleark-stotte-eller-erstatning.pdf   Samtaleark til bolk 2, A4
+    gruppelogg-etter-okta.docx   Word-fil til Hurtigimport i Forms
+    mitt-fasenotat.docx          Word-fil til Hurtigimport i Forms
+    taskcards-fullfor-setningene.png   QR-kode til tavle 1
+    taskcards-fire-dimensjoner.png     QR-kode til tavle 2
+
+  bilder/                        Bildene til de fire bolkene
+  fonts/                         Fraunces og Jost, med lisenser (SIL Open Font License)
+  js/                            PDF-verktøyet til planleggingen og nettloggen, med lisens (MIT)
+
+De generelle Snakk og bytt-kortene og den blanke Word-malen lenkes fra mariannletnes.com/Filer/.
+Alle elevstemmer på nettstedet og i kortene er fiktive.
+
+PERSONVERN
+Skriftene ligger i fonts/ og PDF-verktøyet i js/. Sidene henter ingenting fra andre nettsteder.
+Setningsveggen lenker til to TaskCards-tavler hos NTNU, som NTNU har databehandleravtale for.
+Planleggingen og nettloggen husker innholdet i brukerens egen nettleser,
+slik at det blir liggende om siden lukkes. Det ligger på den maskinen og sendes ingen steder.
