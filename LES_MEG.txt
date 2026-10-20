@@ -6,7 +6,7 @@ NETTPUBLISERING: Legg innholdet i mappen i GitHub-repoet, slik at index.html lig
 
 MAPPESTRUKTUR
   index.html                     Forsiden: de fire bolkene og verktøyene
-  bolk-1-engasjement.html        Bolk 1: Engasjement med KI-blikk
+  bolk-1-engasjement.html        Bolk 1: Engasjement med KI-blikk, Snakk og bytt, setningsveggen og refleksjon
   bolk-2-elevstemmer.html        Bolk 2: Elevenes stemmer, samtalen om støtte eller erstatning
   bolk-3-design.html             Bolk 3: Design og vurdering i eget fag
   bolk-4-verksted.html           Bolk 4: Verksted, bygg og prøv en KI-agent, og metasamtalen
@@ -24,10 +24,11 @@ MAPPESTRUKTUR
     setningsveggen.html          De to TaskCards-tavlene med QR-koder, og tips til egen tavle
 
   Filer/                         Til nedlasting
+    snakk-og-bytt-blanke-kort.docx   Blanke Snakk og bytt-kort til egne spørsmål og dilemmaer, tosidig A4
     sitatkort-elevstemmer.pdf    48 fiktive elevstemmer i åtte fag, tosidig A4 (vend langs kortsiden)
-    snakk-og-bytt-ki.pdf         20 Snakk og bytt-kort om KI i klasserommet, tosidig A4
     sorteringsark-a3.pdf         Fire felt til sitatsorteringen, A3 liggende
     sorteringsark-a2-to-a3.pdf   Samme ark i A2, delt på to A3-ark som limes sammen
+    snakk-og-bytt-ki.pdf         20 Snakk og bytt-kort om KI i klasserommet, tosidig A4
     samtaleark-stotte-eller-erstatning.pdf   Samtaleark til bolk 2, A4
     gruppelogg-etter-okta.docx   Word-fil til Hurtigimport i Forms
     mitt-fasenotat.docx          Word-fil til Hurtigimport i Forms
@@ -38,7 +39,6 @@ MAPPESTRUKTUR
   fonts/                         Fraunces og Jost, med lisenser (SIL Open Font License)
   js/                            PDF-verktøyet til planleggingen og nettloggen, med lisens (MIT)
 
-De generelle Snakk og bytt-kortene og den blanke Word-malen lenkes fra mariannletnes.com/Filer/.
 Alle elevstemmer på nettstedet og i kortene er fiktive.
 
 PERSONVERN

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engasjement når KI er med — Når KI er i rommet</title>
+<meta name="description" content="Refleksjonsoppgave: Se på en undervisningssituasjon med KI gjennom de fire dimensjonene for engasjement.">
+<meta name="theme-color" content="#1E2A45">
+<link rel="icon" type="image/svg+xml" href="../ikon.svg">
+<link rel="stylesheet" href="verktoy.css">
+<script src="../js/jspdf.umd.min.js"></script>
+<style>
+.vt{--beh:#B07A93;--beh-soft:#F5ECF0;--beh-text:#7E4A62;
+    --emo:#34497A;--emo-soft:#E8EBF2;--emo-text:#34497A;
+    --cog:#5E6E67;--cog-soft:#E9EDEA;--cog-text:#4A5A53;
+    --age:#3A2433;--age-soft:#EEE7EB;--age-text:#3A2433}
+.color-key{display:flex;flex-wrap:wrap;gap:8px 18px;margin:1.2rem 0 1rem;font-size:.85rem;color:var(--text-pale)}
+.key{display:flex;align-items:center;gap:7px}
+.key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.lenses{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.lens{display:flex;flex-direction:column;position:relative;width:100%;height:100%;min-height:150px;overflow:hidden;background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-lg);padding:1.2rem 1.2rem 1.1rem 1.5rem;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .15s,border-color .15s,background .15s,box-shadow .15s}
+.lens::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c)}
+.lens:hover{transform:translateY(-2px);border-color:var(--c);background:var(--c-soft)}
+.lens[aria-pressed="true"]{border-color:var(--c);background:var(--c-soft);box-shadow:0 0 0 2px var(--c)}
+.lens small{display:block;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--c-text);margin-bottom:.5rem}
+.lens strong{display:block;font-family:var(--serif);font-weight:300;font-size:1.3rem;line-height:1.25;color:var(--text)}
+.lens span{display:block;font-size:.93rem;line-height:1.5;color:var(--text-soft);margin-top:.45rem}
+.lens em{display:block;margin-top:auto;padding-top:.8rem;font-style:normal;font-size:.82rem;font-weight:500;color:var(--c-text)}
+.lens.beh{--c:var(--beh);--c-soft:var(--beh-soft);--c-text:var(--beh-text)}
+.lens.emo{--c:var(--emo);--c-soft:var(--emo-soft);--c-text:var(--emo-text)}
+.lens.cog{--c:var(--cog);--c-soft:var(--cog-soft);--c-text:var(--cog-text)}
+.lens.age{--c:var(--age);--c-soft:var(--age-soft);--c-text:var(--age-text)}
+.key .beh{background:var(--beh)}.key .emo{background:var(--emo)}.key .cog{background:var(--cog)}.key .age{background:var(--age)}
+.info{display:none;margin-top:1.2rem;background:#fff;border:1px solid var(--lin-dark);border-top:6px solid var(--c,var(--mauve));border-radius:var(--radius-lg);overflow:hidden;scroll-margin-top:130px}
+.info.show{display:block}
+.info-top{padding:1.1rem 1.4rem .9rem;border-bottom:1px solid var(--lin-dark)}
+.info-top small{display:block;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--c-text,var(--mauve-ink));margin-bottom:.3rem}
+.info-top h3{font-family:var(--serif);font-weight:300;font-size:1.6rem;line-height:1.2;color:var(--text)}
+.info-content{padding:1.2rem 1.4rem 1.4rem;color:var(--text-soft)}
+.info-content h4{font-family:var(--serif);font-weight:300;font-size:1.2rem;color:var(--text);margin:1.4rem 0 .4rem}
+.info-content h4:first-child{margin-top:0}
+.info-content p{font-size:.97rem;line-height:1.65;margin:0}
+.info-content p + p{margin-top:.6rem}
+.info-list{margin:.5rem 0 0;padding-left:1.15rem}
+.info-list li{font-size:.97rem;line-height:1.55;margin-bottom:.3rem}
+.info-signs{list-style:none;margin:.5rem 0 0;padding:0}
+.info-signs li{position:relative;padding-left:1.2rem;font-size:.97rem;line-height:1.55;margin-bottom:.3rem}
+.info-signs li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:7px;border-radius:50%;background:var(--c)}
+.info-quotes li{font-style:italic}
+.ki-box{margin-top:.5rem;background:var(--c-soft,var(--lin));border-radius:var(--radius-sm);padding:1rem 1.2rem}
+.ki-box blockquote{margin:.8rem 0 0;font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.1rem;line-height:1.45;color:var(--text)}
+.ki-box cite{display:block;margin-top:.3rem;font-style:normal;font-size:.82rem;color:var(--c-text)}
+.info-caution{margin-top:.5rem;padding:1rem 1.2rem;background:var(--lin);border-left:3px solid var(--c,var(--mauve));border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.info-caution p{color:var(--text)}
+.info-source{margin-top:1.2rem;padding-top:.9rem;border-top:1px solid var(--lin-dark);font-size:.85rem;color:var(--text-pale)}
+.note-wrap{margin-top:1.4rem}
+.note-wrap label{display:block;font-size:.92rem;font-weight:500;color:var(--mauve-ink);margin-bottom:.4rem}
+.vt textarea{width:100%;min-height:110px;background:#fff;color:var(--text);border:1.5px solid var(--lin-dark);border-radius:10px;padding:.8rem .9rem;font:inherit;font-size:1rem;line-height:1.55;resize:vertical}
+.vt textarea:focus{outline:none;border-color:var(--mauve)}
+.prompt-box{margin-top:1.2rem;background:#fff;border:1px solid var(--lin-dark);border-left:3px solid var(--mauve);border-radius:var(--radius-sm);padding:1rem 1.3rem}
+.prompt-box p{font-size:.97rem;color:var(--text-soft);margin:0}
+.prompt-box p + p{margin-top:.6rem}
+.prompt-box strong{color:var(--text);font-weight:500}
+.group-prompt{margin-top:1.2rem;background:var(--lin);border:1px solid var(--lin-dark);border-radius:var(--radius-lg);padding:1.2rem 1.3rem}
+.group-prompt strong{display:block;font-family:var(--serif);font-weight:300;font-size:1.25rem;color:var(--text);margin-bottom:.3rem}
+.group-prompt p{font-size:.97rem;color:var(--text-soft);margin:0}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:1.4rem}
+.reset{background:none;border:0;padding:0 0 2px;color:var(--text-pale);font:inherit;font-size:.92rem;box-shadow:inset 0 -1px 0 var(--lin-dark);cursor:pointer}
+.reset:hover{color:var(--mauve-ink);box-shadow:inset 0 -1px 0 var(--mauve-ink)}
+.download-btn{background:var(--marine);color:var(--on-dark);border:0;border-radius:999px;font:inherit;font-weight:500;font-size:.97rem;padding:.75rem 1.4rem;cursor:pointer}
+.download-btn:hover{background:var(--plum)}
+.footer-note{margin-top:1rem;font-size:.86rem;color:var(--text-pale)}
+.literature{margin:3rem 0 4rem;padding-top:1.4rem;border-top:1px solid var(--lin-dark)}
+.literature h2{font-family:var(--serif);font-weight:300;font-size:1.3rem;color:var(--text);margin-bottom:.6rem}
+.literature ul{list-style:none;margin:0;padding:0}
+.literature li{font-size:.88rem;line-height:1.55;color:var(--text-pale);padding-left:1.5rem;text-indent:-1.5rem;margin-bottom:.5rem}
+@media (max-width:640px){.lenses{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#innhold">Hopp til innholdet</a>
+
+<nav class="site-nav" aria-label="Hovedmeny">
+  <div class="nav-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <ul class="nav-links">
+      <li><a href="../bolk-1-engasjement.html">Engasjement</a></li>
+      <li><a href="../bolk-2-elevstemmer.html">Elevstemmer</a></li>
+      <li><a href="../bolk-3-design.html">Design</a></li>
+      <li><a href="../bolk-4-verksted.html">Verksted</a></li>
+      <li><a href="../index.html#verktoy" aria-current="page">Verktøy</a></li>
+      <li><a href="https://mariannletnes.com" class="sub">Mari-Ann Letnes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="v-hero">
+  <div class="v-hero-inner">
+    <p class="v-crumb"><a href="../bolk-1-engasjement.html">← Bolk 1: Engasjement</a> &nbsp;·&nbsp; <a href="../index.html#verktoy">Alle verktøy</a></p>
+    <p class="v-kicker">Refleksjon · Bolk 1</p>
+    <h1>Engasjement når <em>KI er med</em></h1>
+    <p class="v-desc">Ta utgangspunkt i en konkret situasjon der elevene brukte KI. Undersøk hva du faktisk la merke til, hva du var usikker på, og hva som kan gi elevene større rom for eget faglig arbeid.</p>
+  </div>
+</header>
+
+<main class="vt" id="innhold">
+
+  <section class="section" aria-labelledby="h-slik">
+    <div class="kicker">Ca. 15 minutter</div>
+    <h2 id="h-slik">Slik gjør dere</h2>
+    <ol class="steps">
+      <li><div><strong>Hent fram en situasjon</strong><p>Tenk på en økt der elevene brukte KI, eller kunne ha brukt det. Hva gjorde elevene? Hva la du merke til? Hva var du usikker på?</p></div></li>
+      <li><div><strong>Velg ett blikk</strong><p>Velg det spørsmålet som treffer situasjonen best, og bruk det til å se nærmere på det som skjedde.</p></div></li>
+      <li><div><strong>Snakk to og to</strong><p>Fortell kort om situasjonen. Den som lytter, spør: «Hva fikk deg til å tenke at eleven var med i det faglige arbeidet, og hva gjorde deg usikker?» Bytt roller.</p></div></li>
+      <li><div><strong>Undersøk sammen</strong><p>Gå sammen to par. Sammenlign situasjonene, og diskuter hva dere kan gjøre for at elevene får større rom for eget faglig arbeid når KI er med. Velg én innsikt dere vil ta med videre.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="section" aria-labelledby="h-blikk">
+    <div class="kicker">De fire dimensjonene</div>
+    <h2 id="h-blikk">Velg ett blikk</h2>
+    <div class="copy"><p>Hver dimensjon har sin egen farge. Trykk på spørsmålet du vil bruke som blikk på situasjonen. Da åpner det seg en kort faglig bakgrunn, og hva som skjer med dimensjonen når KI er med.</p></div>
+
+    <div class="color-key" aria-hidden="true">
+      <span class="key"><i class="beh"></i>Atferdsmessig</span>
+      <span class="key"><i class="emo"></i>Emosjonelt</span>
+      <span class="key"><i class="cog"></i>Kognitivt</span>
+      <span class="key"><i class="age"></i>Agentisk</span>
+    </div>
+
+    <ul class="lenses">
+      <li><button class="lens beh" type="button" aria-pressed="false" aria-controls="info" data-dim="beh" data-title="Atferdsmessig engasjement" data-q="Hvordan får vi øye på hva elevene gjør når de arbeider med KI?">
+        <small>Atferdsmessig</small><strong>Hva gjorde elevene når de arbeidet med KI?</strong>
+        <span>Hva kunne du observere underveis, og hva fikk du først se i produktet?</span><em>Les mer →</em></button></li>
+      <li><button class="lens emo" type="button" aria-pressed="false" aria-controls="info" data-dim="emo" data-title="Emosjonelt engasjement" data-q="Hvilke følelser merket du hos elevene da de brukte KI?">
+        <small>Emosjonelt</small><strong>Hvilke følelser merket du hos elevene?</strong>
+        <span>Lettelse, glede, frustrasjon, tvil om eierskap, eller noe annet?</span><em>Les mer →</em></button></li>
+      <li><button class="lens cog" type="button" aria-pressed="false" aria-controls="info" data-dim="cog" data-title="Kognitivt engasjement" data-q="Hva gjorde elevene med det KI ga dem?">
+        <small>Kognitivt</small><strong>Hva gjorde elevene med det KI ga dem?</strong>
+        <span>Undersøkte, sammenlignet og endret de, eller tok de det i bruk slik det var?</span><em>Les mer →</em></button></li>
+      <li><button class="lens age" type="button" aria-pressed="false" aria-controls="info" data-dim="age" data-title="Agentisk engasjement" data-q="Hvem styrte arbeidet når elevene brukte KI?">
+        <small>Agentisk</small><strong>Hvem styrte arbeidet?</strong>
+        <span>Hvem stilte spørsmålene, valgte retning og avgjorde hva som holdt?</span><em>Les mer →</em></button></li>
+    </ul>
+
+    <div class="info" id="info" tabindex="-1">
+      <div class="info-top"><small id="infoLabel"></small><h3 id="infoTitle"></h3></div>
+      <div class="info-content">
+        <h4>Hva begrepet rommer</h4>
+        <div id="infoMeaning"></div>
+        <h4>Når KI er med</h4>
+        <div class="ki-box" id="infoKI"></div>
+        <h4 id="infoSignsHeading">Tegn andre har sett etter</h4>
+        <p id="infoSignsIntro"></p>
+        <ul class="info-signs" id="infoSigns"></ul>
+        <h4>Verdt å merke seg</h4>
+        <div class="info-caution" id="infoCaution"></div>
+        <p class="info-source" id="infoSource"></p>
+      </div>
+    </div>
+
+    <div class="note-wrap">
+      <label for="ownNote">Skriv noen stikkord før dere snakker sammen</label>
+      <textarea id="ownNote" placeholder="Hva skjedde? Hva la du merke til? Hva var du usikker på?"></textarea>
+    </div>
+
+    <div class="prompt-box">
+      <p><strong>To og to:</strong> Hva fikk deg til å tenke at eleven var med i det faglige arbeidet, og hva gjorde deg usikker?</p>
+      <p><strong>Fire sammen:</strong> Hva får dere øye på med de fire blikkene som produktet alene viser lite av?</p>
+    </div>
+
+    <div class="group-prompt">
+      <strong id="groupHeading">Én innsikt dere vil ta med videre</strong>
+      <p id="groupQuestion">Hva kan dere gjøre for at elevene får større rom for eget faglig arbeid når KI er med?</p>
+      <div class="note-wrap"><textarea id="groupNote" aria-labelledby="groupHeading groupQuestion" placeholder="Skriv gruppens viktigste innsikt her …"></textarea></div>
+    </div>
+
+    <div class="actions">
+      <button class="reset" type="button" id="resetBtn">Start på nytt</button>
+      <button class="download-btn" type="button" id="downloadBtn">Last ned refleksjonen som PDF</button>
+    </div>
+    <p class="footer-note">Notatene blir værende i nettleseren på denne maskinen mens siden er åpen.</p>
+  </section>
+
+  <div class="literature">
+    <h2>Litteratur</h2>
+    <ul>
+      <li>Fredricks, J. A., Blumenfeld, P. C. &amp; Paris, A. H. (2004). School engagement: Potential of the concept, state of the evidence. <em>Review of Educational Research, 74</em>(1), 59–109.</li>
+      <li>Reeve, J. &amp; Tseng, C.-M. (2011). Agency as a fourth aspect of students’ engagement during learning activities. <em>Contemporary Educational Psychology, 36</em>(4), 257–267.</li>
+    </ul>
+    <p class="footer-note">Elevstemmene på siden er fiktive.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <p class="footer-info">
+      Mari-Ann Letnes &nbsp;·&nbsp; Institutt for lærerutdanning, NTNU &nbsp;·&nbsp; <a href="mailto:mari.ann.letnes@ntnu.no">mari.ann.letnes@ntnu.no</a><br>
+      Elevstemmene er fiktive &nbsp;·&nbsp; <a href="https://mariannletnes.com">mariannletnes.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+var dimensions = {
+  beh: {
+    label: "Atferdsmessig engasjement",
+    title: "Hva så du faktisk?",
+    meaning: [
+      "Fredricks, Blumenfeld og Paris viser at begrepet brukes om tre ulike ting i forskningen. Det første er oppførsel: å følge de reglene som gjelder i rommet. Det andre er involvering i selve oppgaven, gjennom innsats, utholdenhet, oppmerksomhet og spørsmål. Det tredje er deltakelse i fellesskapet utover den enkelte økta.",
+      "Finn rangerer deltakelse i fire nivåer. Nederst ligger det å svare på det den som leder ber om. Øverst ligger deltakelse som krever eget initiativ."
+    ],
+    signs: [
+      "Oppmerksomhet rettet mot det som skjer",
+      "Innsats og utholdenhet når noe blir vanskelig",
+      "Spørsmål og bidrag inn i samtalen",
+      "Å fullføre det man har begynt på",
+      "Å møte opp og bli værende"
+    ],
+    caution: [
+      "Peterson og kolleger intervjuet elever som observatører hadde vurdert som konsentrerte. Flere av dem fortalte at de ikke hadde tenkt på innholdet i det hele tatt. Samtidig arbeidet mange av dem som så ufokuserte ut, aktivt med å koble det nye til noe de kunne fra før.",
+      "Fredricks og kollegene peker også på at skalaer som slår sammen oppførsel, utholdenhet og deltakelse skjuler viktige forskjeller. En som bryter med formen, men står i oppgaven, og en som følger alle regler uten å arbeide med innholdet, kan havne på samme sted.",
+      "Den synlige atferden er altså et signal, men et svakt et."
+    ],
+    source: "Fredricks, Blumenfeld & Paris (2004), s. 62 og 65–66."
+  },
+
+  emo: {
+    label: "Emosjonelt engasjement",
+    title: "Hvilke reaksjoner la du merke til?",
+    meaning: [
+      "Dette handler om affektive reaksjoner i situasjonen: interesse, glede, kjedsomhet, uro, tristhet. Fredricks og kollegene tar også med reaksjoner på menneskene og på institusjonen, og det Finn kaller identifikasjon: en følelse av å høre til, og en opplevelse av at det som skjer her er verdt noe.",
+      "Eccles og kolleger skiller mellom fire former for verdi, og de er nyttige å ha med seg:"
+    ],
+    meaningList: [
+      "Interesse — gleden ved selve aktiviteten",
+      "Betydning — om dette bekrefter noe ved hvem man er",
+      "Nytte — hva dette kan brukes til senere",
+      "Kostnad — hva det koster å gå inn i det"
+    ],
+    signs: [
+      "Uttrykt interesse for det som skjer",
+      "Nysgjerrighet på innholdet",
+      "Uro, frustrasjon eller kjedsomhet",
+      "Opplevelse av å høre til i rommet",
+      "Reaksjoner på menneskene i rommet"
+    ],
+    caution: [
+      "Målene sier sjelden noe om hva følelsen gjelder. To mennesker kan uttrykke det samme, men den ene er glad for fellesskapet og den andre for innholdet. Kilden til reaksjonen blir stående åpen.",
+      "Forskningen skiller også mellom situasjonsinteresse, som vekkes av noe ved akkurat denne situasjonen og gir seg igjen, og en varigere personlig interesse. Det som er synlig i rommet er som regel det første."
+    ],
+    source: "Fredricks, Blumenfeld & Paris (2004), s. 63 og 66–67."
+  },
+
+  cog: {
+    label: "Kognitivt engasjement",
+    title: "Hva tydet på bearbeiding?",
+    meaning: [
+      "To forskningstradisjoner møtes i dette begrepet. Den ene handler om psykologisk investering: å gå ut over det som kreves, å foretrekke noe krevende, å være fleksibel i møte med problemer. Den andre handler om å være strategisk: å planlegge, følge med på egen forståelse og justere underveis.",
+      "Skillet mellom dype og overflatiske strategier går igjen. Dype strategier innebærer å utdype, koble det nye til det man kan fra før, oppsummere med egne ord og følge med på om man faktisk forstår. Overflatiske strategier sikter mot å komme seg gjennom."
+    ],
+    signs: [
+      "Å knytte det nye til egne erfaringer",
+      "Å lage egne eksempler",
+      "Å be om oppklaring når noe ikke henger sammen",
+      "Å endre framgangsmåte når noe er vanskelig",
+      "Å stoppe opp og gå tilbake til noe man har vært innom"
+    ],
+    caution: [
+      "Tenkning lar seg ikke observere. Den må utledes av det mennesker gjør eller sier. To personer kan se helt like ut mens den ene arbeider seg gjennom innholdet og den andre er ferdig fortest mulig.",
+      "Ordet innsats er dessuten uklart. Det inngår i definisjonene av både atferdsmessig og kognitivt engasjement, og Fredricks og kollegene foreslår å skille mellom innsats som handler om å gjøre arbeidet, og innsats som handler om å forstå stoffet.",
+      "Og en ting til: hva som er mulig å få øye på, avhenger av hva oppgaven åpner for. En oppgave som bare krever gjenkalling gir få tegn på dyp bearbeiding, uansett hvem som sitter der."
+    ],
+    source: "Fredricks, Blumenfeld & Paris (2004), s. 63–64 og 67–68."
+  },
+
+  age: {
+    label: "Agentisk engasjement",
+    title: "Hvordan påvirket de situasjonen?",
+    meaning: [
+      "Reeve og Tseng foreslo i 2011 en fjerde dimensjon, og definerer den som deltakerens konstruktive bidrag inn i det som skjer. Mennesker reagerer på det de møter, men de former det også: de prøver å gjøre innholdet mer personlig, mer interessant, mer relevant for sitt eget liv.",
+      "Forfatterne oppsummerer fem kjennetegn som skiller denne dimensjonen fra de tre andre:"
+    ],
+    meaningList: [
+      "Det kommer før eller underveis, ikke i etterkant",
+      "Det er bevisst og villet",
+      "Det prøver å berike situasjonen",
+      "Det gir deltakeren en stemme i vilkårene for egen læring",
+      "Det er forenlig med at den som leder gjør en god jobb"
+    ],
+    signsIntro: "Slik lyder noen av påstandene Reeve og Tseng målte dimensjonen med:",
+    signsQuotes: true,
+    signs: [
+      "«Jeg sier fra om hva jeg tenker og trenger»",
+      "«Jeg prøver å gjøre det vi lærer så relevant for mitt eget liv som mulig»",
+      "«Jeg sier ifra når jeg mener jeg har noe viktig å bidra med»",
+      "«Når noe er interessant, sier jeg det»",
+      "«Når jeg trenger noe, ber jeg om det framfor å sitte stille med det»"
+    ],
+    caution: [
+      "Det er det konstruktive bidraget som teller. Å snakke seg bort fra innholdet, eller å yte motstand mot den som leder, er også å ta ordet, men Reeve og Tseng regner det som noe annet.",
+      "Studien fant at denne dimensjonen forklarte læringsutbytte på egen hånd, ut over det de tre andre forklarte.",
+      "Det går også en vei tilbake. Forskning fra samme miljø viser at den som leder blir mer støttende overfor deltakere som viser engasjement, og mer styrende overfor dem som ikke gjør det. Det deltakerne gjør, former hvordan de blir møtt.",
+      "Forfatterne nevner selv to forbehold. Målet kan blandes sammen med personlighet, siden noen tar ordet lettere enn andre, og de legger til at den innvendingen gjelder alle fire dimensjonene. Studien undersøkte dessuten bare den aktive siden. De som sitter stille og tar imot det som kommer, er vanskeligere å få øye på."
+    ],
+    source: "Reeve & Tseng (2011), s. 258 og 263–266. Studien bygger på 365 elever ved en videregående skole i Taipei."
+  }
+};
+
+var medKI = {
+  beh: {
+    text: [
+      "Med KI kan produktet være ferdig, språket godt og teksten feilfri, mens arbeidet bak skjedde i en chat utenfor ditt blikk. Den synlige kvaliteten forteller da lite om hvordan arbeidet ble fordelt.",
+      "Se i tillegg etter det eleven gjør underveis: hva hen spør om, velger bort og endrer, og om hen kan forklare og begrunne det ferdige produktet."
+    ],
+    quote: "«Vi var travle hele timen. Mest var det å skrive inn nye spørsmål og kopiere svarene over i dokumentet.»"
+  },
+  emo: {
+    text: [
+      "Elever kan oppleve lettelse og lærelyst med KI, og også tvil og skam, selv når KI-bruken er en del av oppgaven. Tvilen er i seg selv et tegn på engasjement: Er det min kunnskap som kommer fram nå?"
+    ],
+    quote: "«Teksten ble skikkelig bra. Men jeg lurer på om læreren tror at jeg kan skrive sånn selv.»"
+  },
+  cog: {
+    text: [
+      "KI kan forklare, forenkle og gi oversikt. Det avgjørende er hva eleven gjør med det KI gir: undersøker, sammenligner og endrer, eller tar det i bruk slik det er.",
+      "Tankearbeidet blir synlig når eleven får forklare, vise eller begrunne noe, gjerne muntlig og underveis."
+    ],
+    quote: "«Først da jeg måtte forklare svaret med egne ord, skjønte jeg hva det egentlig handlet om.»"
+  },
+  age: {
+    text: [
+      "Med KI får elevene et nytt handlingsrom. De kan velge hva KI skal gjøre: forklare, gi et eksempel, foreslå alternativer, gi tilbakemelding, eller la neste trekk være deres eget.",
+      "Evnen til å velge den støtten man trenger akkurat nå, kan vi kalle digital dømmekraft. Spørsmålet blir hvem som stiller spørsmålene, velger retning og avgjør hva som holder."
+    ],
+    quote: "«Jeg ba den stille meg spørsmål i stedet for å gi meg svaret. Da måtte jeg tenke selv.»"
+  }
+};
+
+var infoBox=document.getElementById('info'),infoLabel=document.getElementById('infoLabel'),infoTitle=document.getElementById('infoTitle'),
+    infoMeaning=document.getElementById('infoMeaning'),infoKI=document.getElementById('infoKI'),infoSignsIntro=document.getElementById('infoSignsIntro'),
+    infoSigns=document.getElementById('infoSigns'),infoCaution=document.getElementById('infoCaution'),infoSource=document.getElementById('infoSource');
+function fillParagraphs(c,texts){c.innerHTML='';for(var i=0;i<texts.length;i++){var p=document.createElement('p');p.textContent=texts[i];c.appendChild(p);}}
+function showInfo(key,lensEl){
+  var d=dimensions[key],k=medKI[key]; if(!d) return;
+  infoLabel.textContent=d.label; infoTitle.textContent=lensEl.getAttribute('data-q');
+  fillParagraphs(infoMeaning,d.meaning);
+  if(d.meaningList){var ul=document.createElement('ul');ul.className='info-list';for(var i=0;i<d.meaningList.length;i++){var li=document.createElement('li');li.textContent=d.meaningList[i];ul.appendChild(li);}infoMeaning.appendChild(ul);}
+  fillParagraphs(infoKI,k.text);
+  if(k.quote){var bq=document.createElement('blockquote');bq.textContent=k.quote;var ci=document.createElement('cite');ci.textContent='Fiktiv elevstemme';bq.appendChild(ci);infoKI.appendChild(bq);}
+  infoSignsIntro.textContent=d.signsIntro||''; infoSignsIntro.style.display=d.signsIntro?'block':'none';
+  infoSigns.innerHTML=''; infoSigns.className='info-signs'+(d.signsQuotes?' info-quotes':'');
+  for(var j=0;j<d.signs.length;j++){var s=document.createElement('li');s.textContent=d.signs[j];infoSigns.appendChild(s);}
+  fillParagraphs(infoCaution,d.caution); infoSource.textContent='Kilde: '+d.source;
+  var c=getComputedStyle(lensEl);
+  ['--c','--c-text','--c-soft'].forEach(function(v){infoBox.style.setProperty(v,c.getPropertyValue(v).trim());});
+  infoBox.classList.add('show');
+}
+var selectedTitle='',selectedQuestion='';
+var lensButtons=document.querySelectorAll('.lens');
+for(var i=0;i<lensButtons.length;i++){lensButtons[i].addEventListener('click',function(){
+  var open=this.getAttribute('aria-pressed')==='true';
+  for(var j=0;j<lensButtons.length;j++) lensButtons[j].setAttribute('aria-pressed','false');
+  if(open){selectedTitle='';selectedQuestion='';infoBox.classList.remove('show');return;}
+  this.setAttribute('aria-pressed','true'); selectedTitle=this.getAttribute('data-title'); selectedQuestion=this.getAttribute('data-q');
+  showInfo(this.getAttribute('data-dim'),this);
+  try{infoBox.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){infoBox.scrollIntoView();}
+});}
+document.getElementById('resetBtn').addEventListener('click',function(){
+  selectedTitle='';selectedQuestion='';document.getElementById('ownNote').value='';document.getElementById('groupNote').value='';
+  for(var i=0;i<lensButtons.length;i++) lensButtons[i].setAttribute('aria-pressed','false'); infoBox.classList.remove('show');
+});
+document.getElementById('downloadBtn').addEventListener('click',function(){
+  var own=document.getElementById('ownNote').value.trim(),group=document.getElementById('groupNote').value.trim();
+  if(!selectedTitle&&!own&&!group){alert('Velg gjerne et spørsmål eller skriv noen stikkord før du laster ned.');return;}
+  if(!(window.jspdf&&window.jspdf.jsPDF)){downloadTxt(own,group);return;}
+  var doc=new window.jspdf.jsPDF(),margin=20,usable=doc.internal.pageSize.getWidth()-margin*2,y=24;
+  function tb(text,size,bold,color){if(!text)return;doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(size);doc.setTextColor.apply(doc,color||[40,40,40]);
+    var lines=doc.splitTextToSize(text,usable);for(var i=0;i<lines.length;i++){if(y>278){doc.addPage();y=24;}doc.text(lines[i],margin,y);y+=size*0.46;}y+=4;}
+  tb('Engasjement når KI er med',17,true,[30,42,69]);
+  if(selectedTitle){tb(selectedTitle,12,true,[126,74,98]);tb(selectedQuestion,11,false,[60,60,60]);}
+  if(own){tb('Mine stikkord',12,true,[30,42,69]);tb(own,11,false,[60,60,60]);}
+  if(group){tb('Én innsikt vi vil ta med videre',12,true,[30,42,69]);tb(group,11,false,[60,60,60]);}
+  doc.save('refleksjon-engasjement-ki.pdf');
+});
+function downloadTxt(own,group){
+  var lines=['Engasjement når KI er med',''];
+  if(selectedTitle){lines.push(selectedTitle,selectedQuestion,'');}
+  if(own){lines.push('Mine stikkord:',own,'');}
+  if(group){lines.push('Én innsikt vi vil ta med videre:',group);}
+  var blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='refleksjon-engasjement-ki.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

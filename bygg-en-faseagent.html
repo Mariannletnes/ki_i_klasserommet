@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bygg en faseagent — Når KI er i rommet</title>
+<meta name="description" content="Tilpass faseagentene fra forskningsprosjektet til eget fag, lim instruksen inn i Copilot og test agenten i fire elevroller.">
+<meta name="theme-color" content="#1E2A45">
+<link rel="icon" type="image/svg+xml" href="../ikon.svg">
+<link rel="stylesheet" href="verktoy.css">
+<style>
+/* Tillegg for denne siden. Resten kommer fra verktoy.css. */
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.vt .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:1.6rem}
+.vt .fields label{display:grid;gap:4px;font-size:.86rem;color:var(--text-pale)}
+.vt .fields input{font:inherit;font-size:1rem;color:var(--text);background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-sm);padding:9px 12px;min-width:0}
+.vt .fields input:focus{border-color:var(--mauve);outline:none}
+.vt .linkbtn{margin-top:14px;background:none;border:0;padding:0;font:inherit;font-size:.92rem;color:var(--mauve-ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.vt .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:1.6rem}
+.vt .tab{font:inherit;text-align:left;cursor:pointer;color:var(--text-soft);background:var(--lin);border:1px solid var(--lin-dark);border-top:4px solid var(--c);border-radius:var(--radius-sm);padding:12px 14px;display:grid;gap:2px;transition:background .16s ease,box-shadow .16s ease}
+.vt .tab b{font-weight:500;color:var(--text);line-height:1.3}
+.vt .tab span{font-size:.82rem;color:var(--text-pale)}
+.vt .tab[aria-selected="true"]{background:#fff;box-shadow:var(--shadow)}
+.vt .phase-desc{margin-top:14px;background:#fff;border:1px solid var(--lin-dark);border-left:4px solid var(--c);border-radius:var(--radius-sm);padding:14px 18px;max-width:52rem;color:var(--text-soft)}
+.vt .phase-desc .tag{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;font-weight:500;color:var(--text-pale);margin-bottom:4px}
+.vt .sheet{margin-top:14px;background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-lg);overflow:hidden}
+.vt .sheet-bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--lin-dark);background:var(--lin)}
+.vt .count{font-size:.84rem;color:var(--text-pale);font-variant-numeric:tabular-nums}
+.vt .copybtn{font:inherit;font-weight:500;font-size:.92rem;cursor:pointer;background:var(--marine);color:#fff;border:0;border-radius:var(--radius-sm);padding:9px 18px}
+.vt .copybtn:hover{background:var(--marine-deep)}
+.vt .sheet pre{margin:0;padding:16px 18px;font-size:.84rem;line-height:1.55;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;max-height:440px;overflow:auto}
+.vt .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vt .say{display:block;margin:8px 0;font-size:.86rem;background:var(--cream);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text)}
+.vt .test .insight{margin-top:12px;padding-top:12px;border-top:1px solid var(--lin-dark);color:var(--text)}
+.vt .test .insight span{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;font-weight:500;color:var(--mauve-ink);margin-bottom:4px}
+@media (max-width:760px){.vt .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<a class="skip" href="#innhold">Hopp til innholdet</a>
+
+<nav class="site-nav" aria-label="Hovedmeny">
+  <div class="nav-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <ul class="nav-links">
+      <li><a href="../bolk-1-engasjement.html">Engasjement</a></li>
+      <li><a href="../bolk-2-elevstemmer.html">Elevstemmer</a></li>
+      <li><a href="../bolk-3-design.html">Design</a></li>
+      <li><a href="../bolk-4-verksted.html">Verksted</a></li>
+      <li><a href="../index.html#verktoy" aria-current="page">Verktøy</a></li>
+      <li><a href="https://mariannletnes.com" class="sub">Mari-Ann Letnes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="v-hero">
+  <div class="v-hero-inner">
+    <p class="v-crumb"><a href="../bolk-4-verksted.html">← Bolk 4: Verksted</a> &nbsp;·&nbsp; <a href="../index.html#verktoy">Alle verktøy</a></p>
+    <p class="v-kicker">Faseagenter · Bolk 4</p>
+    <h1>Bygg en <em>faseagent</em></h1>
+    <p class="v-desc">I tredje syklus av forskningsprosjektet fikk elevene én KI-agent for hver fase av arbeidet. Agenten skal hjelpe elevene å tenke selv og holde arbeidet hos dem. Her tilpasser du instruksen til ditt fag, lager agenten i Copilot og prøver den ut som elev.</p>
+  </div>
+</header>
+
+<main class="vt" id="innhold">
+
+  <nav class="jump" aria-label="Steg på siden">
+    <ul>
+      <li><a href="#h-start">Før du starter</a></li>
+      <li><a href="#h-fag">1 · Ditt fag</a></li>
+      <li><a href="#h-fase">2 · Instruksen</a></li>
+      <li><a href="#h-copilot">3 · Copilot</a></li>
+      <li><a href="#h-test">4 · Test</a></li>
+      <li><a href="#h-talk">5 · Snakk sammen</a></li>
+    </ul>
+  </nav>
+
+  <section class="section peach" aria-labelledby="h-start">
+    <div class="kicker">Spilleregler</div>
+    <h2 id="h-start">Før du starter</h2>
+    <ul class="cards cards--3">
+      <li class="card"><strong>Bruk jobbkontoen</strong>Logg inn i Copilot med jobbkontoen. Da gjelder skolens avtale med Microsoft.</li>
+      <li class="card"><strong>Spill elev</strong>Bruk et tema fra ditt eget fag, eller et du finner på.</li>
+      <li class="card"><strong>Bruk tenkte elever</strong>Skriv inn tenkte navn og eksempler, og hold opplysninger om ekte elever utenfor.</li>
+    </ul>
+    <p class="note">Det du skriver i feltene under, blir værende på denne siden og forsvinner når du lukker den.</p>
+  </section>
+
+  <section class="section yellow" aria-labelledby="h-fag">
+    <div class="kicker">Steg 1</div>
+    <h2 id="h-fag">Tilpass til ditt fag</h2>
+    <div class="copy"><p>Feltene er fylt ut med podkastprosjektet fra forskningen. Skriv inn ditt eget opplegg, så endres instruksen i neste steg.</p></div>
+    <div class="fields">
+      <label for="f-fag">Fag<input id="f-fag" data-k="fag" autocomplete="off"></label>
+      <label for="f-trinn">Trinn<input id="f-trinn" data-k="trinn" autocomplete="off"></label>
+      <label for="f-produkt">Hva lager elevene?<input id="f-produkt" data-k="produkt" autocomplete="off"></label>
+      <label for="f-tema">Tema<input id="f-tema" data-k="tema" autocomplete="off"></label>
+      <label for="f-mottaker">Hvem er mottakeren?<input id="f-mottaker" data-k="mottaker" autocomplete="off"></label>
+      <label for="f-gruppe">Gruppestørrelse<input id="f-gruppe" data-k="gruppe" autocomplete="off"></label>
+    </div>
+    <button class="linkbtn" id="reset" type="button">Tilbake til podkastprosjektet</button>
+  </section>
+
+  <section class="section aqua" aria-labelledby="h-fase">
+    <div class="kicker">Steg 2</div>
+    <h2 id="h-fase">Velg fase og kopier instruksen</h2>
+    <div class="tabs" role="tablist" id="tabs" aria-label="Faser"></div>
+    <div class="phase-desc" id="phase"></div>
+    <div class="sheet">
+      <div class="sheet-bar">
+        <span class="count" id="count"></span>
+        <button class="copybtn" id="copy" type="button">Kopier instruksen</button>
+      </div>
+      <pre class="mono" id="out" tabindex="0" aria-label="Instruks til agenten"></pre>
+    </div>
+  </section>
+
+  <section class="section lavender" aria-labelledby="h-copilot">
+    <div class="kicker">Steg 3</div>
+    <h2 id="h-copilot">Lag agenten i Copilot</h2>
+    <ol class="steps">
+      <li><div><strong>Åpne Copilot</strong><p>Åpne Copilot i nettleseren eller i Teams, logget inn med jobbkontoen.</p></div></li>
+      <li><div><strong>Velg «Opprett agent»</strong><p>Valget ligger i menyen til venstre (på engelsk «Create agent»). Mangler valget, kan du lime instruksen inn som første melding i en vanlig samtale og skrive «Følg denne instruksen fra nå av».</p></div></li>
+      <li><div><strong>Fyll ut under «Konfigurer»</strong><p>Gi agenten et navn, for eksempel «Fase 1: Oppstart», og en kort beskrivelse. Lim instruksen inn i feltet for instruksjoner. Forslag til startmeldinger eleven kan klikke på:</p>
+        <div class="chips"><span class="badge">Vi jobber som gruppe</span><span class="badge">Jeg jobber alene</span><span class="badge">Hjelp oss å finne ut hvilken fase vi er i</span></div></div></li>
+      <li><div><strong>Test før du lagrer</strong><p>Bruk testvinduet og prøv de fire elevrollene under.</p></div></li>
+      <li><div><strong>Lagre og juster</strong><p>Velg «Opprett». Du kan endre instruksen så mange ganger du vil. Vil du dele agenten med elever eller kolleger, deler du lenken innenfor skolen.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="section rose" aria-labelledby="h-test">
+    <div class="kicker">Steg 4</div>
+    <h2 id="h-test">Test agenten som elev</h2>
+    <div class="copy"><p>Spill fire ulike elever, og se hva agenten gjør med tenkningen deres.</p></div>
+    <ul class="cards" id="tests"></ul>
+  </section>
+
+  <section class="section blue" aria-labelledby="h-talk">
+    <div class="kicker">Steg 5</div>
+    <h2 id="h-talk">Snakk sammen etterpå</h2>
+    <ol class="numbered">
+      <li><span class="num" aria-hidden="true">1</span><div><strong>Hvor ga agenten for lite, og hvor ga den for mye?</strong></div></li>
+      <li><span class="num" aria-hidden="true">2</span><div><strong>Hva i instruksen ville du endret for ditt fag og dine elever?</strong></div></li>
+      <li><span class="num" aria-hidden="true">3</span><div><strong>Hvilken fase i ditt eget opplegg trenger mest friksjon, og hvilken trenger mest støtte?</strong></div></li>
+    </ol>
+    <p class="note">Instruksene bygger på faseagentene fra forskningsprosjektet «Å lære med maskiner».</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <p class="footer-info">
+      Mari-Ann Letnes &nbsp;·&nbsp; Institutt for lærerutdanning, NTNU &nbsp;·&nbsp; <a href="mailto:mari.ann.letnes@ntnu.no">mari.ann.letnes@ntnu.no</a><br>
+      Elevstemmene er fiktive &nbsp;·&nbsp; <a href="https://mariannletnes.com">mariannletnes.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function(){
+var DEF={fag:"norsk og naturfag",trinn:"vg1",produkt:"en podkast",tema:"bioteknologi",mottaker:"ungdomsskoleelever",gruppe:"tre til fire"};
+var v=Object.assign({},DEF), cur=0;
+
+var P=[
+ {n:"Fase 1",t:"Oppstart og utpakking",d:"Fremmedgjøring",c:"var(--c-blue)",
+  purpose:"Hjelp elevene å pakke ut oppgaven, få oversikt over hva de skal gjøre og oppdage hva de fortsatt lurer på. Støtt undring (hva lurer vi på?), perspektivering (hva ber oppgaven egentlig om, og hvem er mottakeren?) og vurdering (hva må vi finne ut av først?).",
+  q:["Hva tror dere oppgaven egentlig ber dere om?","Hva vet dere allerede om {tema}, og hva er helt nytt?","Hvilke spørsmål eller dilemmaer vekker temaet hos dere?","Hvordan kan dere sjekke det dere finner?"],
+  sp:["Fagstoffet er nytt for mange i denne fasen. Vær raskere med korte forklaringer her enn i de andre fasene.","Be elevene tenke på mottakeren og språket fra starten: Hvordan forklarer vi dette for {mottaker}?","Hvis elevene lager en skisse eller infografikk, hjelp dem å tegne den foreløpige forståelsen sin. Den skal vise hva de tror de forstår nå, ikke være perfekt."]},
+ {n:"Fase 2",t:"Idé og utkast",d:"Materialdialog",c:"var(--c-sand)",
+  purpose:"Hjelp elevene å bearbeide fagstoff og KI-forslag som materiale: velge, prøve ut, justere og begrunne. Elevene skal gå fra oversikt til fordypning, og fra informasjon til argumentasjon og utkast.",
+  q:["Hvilket av disse forslagene passer best for {mottaker}, og hvorfor?","Hva skjer med forklaringen hvis dere bruker et annet eksempel?","Stemmer dette med læreboka eller en annen kilde dere stoler på?","Hvilke argumenter har dere for og mot?"],
+  sp:["Etiske spørsmål: Du kan kort forklare ulike måter å tenke etikk på, for eksempel ut fra konsekvenser, prinsipper eller verdier. Bruk dem som verktøy i samtalen, ikke som teori elevene skal lære.","Du kan gi en mal for hvordan {produkt} kan bygges opp, eller vise ett kort eksempel. La elevene skrive resten selv.","Støtt rollefordeling og samarbeid i gruppa."]},
+ {n:"Fase 3",t:"Produksjon",d:"Meningsskaping",c:"var(--c-mauve)",
+  purpose:"Hjelp elevene å gi fagstoffet form for mottakeren og vurdere hvordan det virker. Arbeid med innholdet elevene allerede har, og hjelp dem å justere det.",
+  q:["Hvordan virker dette når dere leser det høyt eller viser det fram?","Hvor tror dere {mottaker} vil falle av?","Får alle i gruppa en tydelig stemme?","Hvilke ord eller begreper må forklares bedre?"],
+  sp:["Rett oppmerksomheten mot formidlingen: språk, form, tempo og helhet.","Hjelp med praktisk organisering av arbeidet.","Hvis elevene har en skisse eller infografikk, bruk den til å vurdere struktur, rekkefølge og overganger."]},
+ {n:"Fase 4",t:"Refleksjon",d:"Tilbakekomst",c:"var(--c-plum)",
+  purpose:"Hjelp eleven å vende tilbake til prosessen, sette ord på egne valg og stå inne for det som er skapt. Her skal du nesten bare spørre og oppsummere. La vurderingen med karakter ligge hos læreren.",
+  q:["Var det noe som fikk deg til å stoppe opp eller se oppgaven på en ny måte?","Hvilke KI-svar måtte du tolke, justere eller forkaste?","Hvilke valg kan du nå begrunne og stå inne for?","Hva forstår du annerledes nå enn da dere startet, og hvilken rolle hadde KI i den endringen?","Hva har du lært om din egen måte å arbeide på?"],
+  sp:["Støtt refleksjon over når KI har vært nyttig, når den har vært begrensende, og hvordan elevene brukte den."]}
+];
+
+var T=[
+ {h:"Eleven som er ny i stoffet",say:"Vi skal lage {produkt} om {tema}, men jeg skjønner ikke helt hva det er.",look:"Gir agenten en kort forklaring og en kilde, og ber deg så forklare med egne ord?",q:"Spørsmål hjelper når eleven har noe å tenke med. Når fagkunnskapen mangler, forklarer agenten kort først og spør etterpå."},
+ {h:"Eleven som vil ha alt ferdig",say:"Kan du ikke bare lage hele greia for oss?",look:"Svarer agenten vennlig at jobben er deres, og tilbyr en mal, et eksempel eller et spørsmål?",q:"Et vennlig svar med et alternativ holder eleven i arbeidet og gjør skillet mellom hjelp på veien og ferdig arbeid tydelig."},
+ {h:"Gruppa som går lei",say:"Svar kort fire–fem ganger på rad: «vet ikke», «ok», «ja».",look:"Stiller agenten ett spørsmål om gangen, og gir den noe tilbake etter høyst tre?",q:"Spørsmål kan hjelpe en gruppe i gang, og for mange spørsmål blir en byrde. Agenten gir noe tilbake underveis."},
+ {h:"Gruppa som har spurt en annen KI",say:"Vi fant dette i ChatGPT: [lim inn en påstand om temaet]. Stemmer det?",look:"Ber agenten dere vurdere påstanden og finne ut hvordan dere kan sjekke den?",q:"KI kan ta feil med stor sikkerhet. Når sjekken bygges inn i samtalen, får eleven støtte til å gjøre den."}
+];
+
+function f(s){return s.replace(/\{(\w+)\}/g,function(_,k){return ((v[k]||"").trim()||DEF[k]);});}
+
+function build(p){
+ var L=[];
+ L.push("ROLLE");
+ L.push(f("Du er en pedagogisk KI-agent i et prosjekt i {fag} på {trinn}. Elevene arbeider i grupper på {gruppe} og lager {produkt} om {tema} for {mottaker}. Du er en samtalepartner som hjelper elevene å tenke selv. Du er ikke en fasit, og du skriver ikke ferdige tekster for dem. Elevene har selv ansvaret for faglig innhold, vurderinger og valg."));
+ L.push("");
+ L.push("DENNE FASEN: "+p.n.toUpperCase()+" – "+p.t.toUpperCase());
+ L.push(f(p.purpose));
+ L.push("Spørsmål du kan bruke (ett om gangen):");
+ p.q.forEach(function(x){L.push("- "+f(x));});
+ L.push("Særlig i denne fasen:");
+ p.sp.forEach(function(x){L.push("- "+f(x));});
+ L.push("");
+ L.push("NÅR SAMTALEN STARTER");
+ L.push("- Hils kort og si at du er laget for "+p.n.toLowerCase()+": "+p.t.toLowerCase()+".");
+ L.push("- Spør: «Jobber dere som gruppe eller alene nå?» og gi valgene 1 Gruppe og 2 Alene. Tilpass spørsmålene etter svaret.");
+ L.push("- Spør hva de holder på med akkurat nå, og hva de trenger hjelp med.");
+ L.push("- Hvis eleven er usikker på hvilken fase hun er i, hjelp henne å finne ut av det ut fra hva gruppa holder på med.");
+ L.push("");
+ L.push("SLIK SKAL DU HJELPE");
+ ["Finn ut hva eleven kan. Be eleven først si med egne ord hva hun vet eller har tenkt.",
+  "Mangler eleven fagkunnskap for å komme videre, skal du forklare kort og enkelt, med høyst fem–seks setninger og gjerne et eksempel. Vis til NDLA, Store norske leksikon eller læreboka, slik at eleven kan sjekke. Be deretter eleven forklare det tilbake med egne ord.",
+  "Har eleven noe å tenke med, skal du stille spørsmål som hjelper henne videre, i stedet for å gi svaret.",
+  "Still bare ett spørsmål om gangen.",
+  "Still aldri mer enn tre spørsmål på rad uten å gi noe tilbake: et eksempel, en mal, en kort forklaring eller en oppsummering av det eleven har sagt.",
+  "Gi eksempler og maler, ikke ferdige tekster. Du kan vise hvordan én setning, én overgang eller én forklaring kan se ut, men aldri skrive hele produktet, hele avsnitt eller ferdige standpunkter.",
+  "Ber eleven deg lage hele produktet eller svare på oppgaven, skal du si kort og vennlig at det er deres jobb. Tilby i stedet en struktur, et eksempel eller spørsmål som kan hjelpe dem i gang.",
+  "Når eleven bruker svar fra andre KI-verktøy, ber du dem vurdere hva som stemmer, hva som er uklart, og hvordan de kan sjekke det.",
+  "I etiske spørsmål skal du ikke ta stilling for eleven. Hjelp dem å finne egne argumenter og motargumenter. Det er lov å være uenige."
+ ].forEach(function(x,i){L.push((i+1)+". "+x);});
+ L.push("");
+ L.push("SPRÅK OG FORM");
+ L.push(f("- Skriv på bokmål, enkelt og vennlig, tilpasset elever på {trinn}."));
+ L.push("- Hold svarene korte, vanligvis under 100 ord. Unngå lange lister.");
+ L.push("- Be ikke om fullt navn eller andre personopplysninger, og minn elevene på ikke å dele slike opplysninger.");
+ L.push("");
+ L.push("PROSESSNOTATER");
+ L.push("Når elevene sier at de er ferdige for i dag, eller ber om det, tilbyr du hjelp med prosessnotatet. Lag notatet ut fra det elevene selv har sagt i samtalen. Spør etter det som mangler, og legg ikke til innhold de ikke har uttrykt.");
+ L.push("- Gruppemodus, etter hver økt: dato, hvem som var til stede, hva gruppa har arbeidet med, valg de har tatt, hvordan KI og andre kilder er brukt, og hva de starter med neste gang.");
+ L.push("- Individuell modus, ved slutten av fasen: egen forståelse, egen rolle i gruppa og egne faglige valg.");
+ return L.join("\n");
+}
+
+var tabs=document.getElementById("tabs");
+P.forEach(function(p,i){
+ var b=document.createElement("button");b.type="button";b.className="tab";b.setAttribute("role","tab");b.id="tab"+i;
+ b.style.setProperty("--c",p.c);
+ b.innerHTML="<b></b><span></span>";b.children[0].textContent=p.n+": "+p.t;b.children[1].textContent=p.d;
+ b.addEventListener("click",function(){cur=i;render();});
+ b.addEventListener("keydown",function(e){var d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(d){cur=(cur+d+P.length)%P.length;render();document.getElementById("tab"+cur).focus();}});
+ tabs.appendChild(b);
+});
+
+function renderTests(){
+ var ul=document.getElementById("tests");ul.innerHTML="";
+ T.forEach(function(t){
+  var li=document.createElement("li");li.className="card test";
+  li.innerHTML="<strong></strong><code class='say mono'></code><span></span><p class='insight'><span>Hvorfor</span></p>";
+  li.children[0].textContent=t.h;li.children[1].textContent=f(t.say);li.children[2].textContent=t.look;li.children[3].appendChild(document.createTextNode(t.q));
+  ul.appendChild(li);
+ });
+}
+
+function render(){
+ var p=P[cur];
+ for(var i=0;i<P.length;i++){var t=document.getElementById("tab"+i);t.setAttribute("aria-selected",i===cur?"true":"false");t.tabIndex=i===cur?0:-1;}
+ var ph=document.getElementById("phase");ph.style.setProperty("--c",p.c);
+ ph.innerHTML="<span class='tag'></span><p></p>";ph.children[0].textContent=p.n+" · "+p.d;ph.children[1].textContent=f(p.purpose);
+ var txt=build(p);
+ document.getElementById("out").textContent=txt;
+ document.getElementById("count").textContent=txt.length.toLocaleString("nb-NO")+" tegn · Copilot tillater opptil 8 000";
+ renderTests();
+}
+
+document.querySelectorAll("input[data-k]").forEach(function(inp){
+ inp.value=v[inp.dataset.k];
+ inp.addEventListener("input",function(){v[inp.dataset.k]=inp.value;render();});
+});
+document.getElementById("reset").addEventListener("click",function(){
+ v=Object.assign({},DEF);
+ document.querySelectorAll("input[data-k]").forEach(function(inp){inp.value=v[inp.dataset.k];});
+ render();
+});
+
+var btn=document.getElementById("copy");
+btn.addEventListener("click",function(){
+ var out=document.getElementById("out");
+ function done(m){btn.textContent=m;setTimeout(function(){btn.textContent="Kopier instruksen";},2200);}
+ function fallback(){var r=document.createRange();r.selectNodeContents(out);var s=getSelection();s.removeAllRanges();s.addRange(r);done("Markert – trykk Ctrl+C");}
+ try{navigator.clipboard.writeText(out.textContent).then(function(){done("Kopiert");},fallback);}catch(e){fallback();}
+});
+
+render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setningsveggen — Når KI er i rommet</title>
+<meta name="description" content="To TaskCards-tavler til fagdagen: fullfør setningene, og fire sider ved engasjement når KI er med.">
+<meta name="theme-color" content="#1E2A45">
+<link rel="icon" type="image/svg+xml" href="../ikon.svg">
+<link rel="stylesheet" href="verktoy.css">
+<style>
+.boards{list-style:none;padding:0;margin:1.6rem 0 0;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.board{background:#fff;border:1px solid var(--lin-dark);border-top:4px solid var(--b);border-radius:var(--radius-lg);padding:1.4rem;display:grid;grid-template-columns:120px 1fr;gap:1.2rem;align-items:start}
+.board img{width:120px;height:120px;border-radius:8px;border:1px solid var(--lin-dark)}
+.board .tag{display:block;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--b);margin-bottom:.4rem}
+.board h3{font-family:var(--serif);font-weight:300;font-size:1.35rem;line-height:1.25;color:var(--text);margin:0 0 .5rem}
+.board ul{margin:0;padding-left:1.1rem;font-size:.95rem;line-height:1.55;color:var(--text-soft)}
+.board a.open{display:inline-block;margin-top:.8rem;font-size:.9rem;font-weight:500;color:var(--mauve-ink);text-decoration:none;border-bottom:1px solid rgba(126,74,98,.35)}
+@media (max-width:760px){.boards{grid-template-columns:1fr}}
+@media (max-width:440px){.board{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#innhold">Hopp til innholdet</a>
+
+<nav class="site-nav" aria-label="Hovedmeny">
+  <div class="nav-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <ul class="nav-links">
+      <li><a href="../bolk-1-engasjement.html">Engasjement</a></li>
+      <li><a href="../bolk-2-elevstemmer.html">Elevstemmer</a></li>
+      <li><a href="../bolk-3-design.html">Design</a></li>
+      <li><a href="../bolk-4-verksted.html">Verksted</a></li>
+      <li><a href="../index.html#verktoy" aria-current="page">Verktøy</a></li>
+      <li><a href="https://mariannletnes.com" class="sub">Mari-Ann Letnes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="v-hero">
+  <div class="v-hero-inner">
+    <p class="v-crumb"><a href="../bolk-1-engasjement.html">← Bolk 1: Engasjement</a> &nbsp;·&nbsp; <a href="../index.html#verktoy">Alle verktøy</a></p>
+    <p class="v-kicker">Setningsveggen · Bolk 1</p>
+    <h1>Setnings<em>veggen</em></h1>
+    <p class="v-desc">Deltakerne skriver korte svar på en felles tavle, og dere leser dem sammen. To tavler til fagdagen, og tips til å lage din egen.</p>
+  </div>
+</header>
+
+<main class="vt" id="innhold">
+
+  <section class="section aqua" aria-labelledby="h-tavler">
+    <div class="kicker">Åpning og refleksjon</div>
+    <h2 id="h-tavler">To tavler i rommet</h2>
+    <div class="copy"><p>Deltakerne skanner QR-koden og skriver kortet sitt rett på tavla, uten å logge inn. Vis tavla på skjermen mens kortene kommer inn, og les den sammen etterpå.</p></div>
+    <ul class="boards">
+      <li class="board" style="--b:var(--mauve-ink)">
+        <img src="../Filer/taskcards-fullfor-setningene.png" alt="QR-kode til tavla Fullfør setningene">
+        <div><span class="tag">Tavle 1 · Åpning</span><h3>Fullfør setningene</h3>
+          <ul><li>Jeg vet at elevene er med når …</li><li>Jeg blir usikker på om de er med når de bruker KI fordi …</li></ul>
+          <a class="open" href="https://ntnu.taskcards.app/#/board/5eb9955e-5a81-4674-88b5-cea6e93edef7?token=dff98fa8-e4f9-4c92-82b0-bcf5357aff0f" target="_blank" rel="noopener">Åpne tavla →</a></div>
+      </li>
+      <li class="board" style="--b:var(--forest-ink)">
+        <img src="../Filer/taskcards-fire-dimensjoner.png" alt="QR-kode til tavla med de fire dimensjonene">
+        <div><span class="tag">Tavle 2 · Bolk 1</span><h3>Fire sider ved engasjement</h3>
+          <ul><li>Hvordan får vi øye på hva elevene gjør når de arbeider med KI?</li><li>Hvilke følelser merker vi hos elevene når de bruker KI?</li><li>Hva gjør elevene med det KI gir dem?</li><li>Hvem styrer arbeidet når elevene bruker KI?</li></ul>
+          <a class="open" href="https://ntnu.taskcards.app/#/board/03c776d9-db2a-414b-ab02-a713ad49100f?token=60327abb-4b8a-4259-8b5b-1171b26cd797" target="_blank" rel="noopener">Åpne tavla →</a></div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section rose" aria-labelledby="h-les">
+    <div class="kicker">Ca. 5 minutter per tavle</div>
+    <h2 id="h-les">Les tavla sammen</h2>
+    <div class="copy"><p>Snakk først i par, og løft så noen funn i plenum.</p></div>
+    <ol class="steps">
+      <li><div><strong>Hva går igjen?</strong><p>Er det ting vi ser at elevene gjør, eller ting vi tolker at de tenker og føler?</p></div></li>
+      <li><div><strong>Hva kan KI vise fram?</strong><p>Hvilke av tegnene kunne en elev vist fram ved hjelp av KI, uten å være med i arbeidet?</p></div></li>
+      <li><div><strong>Hva handler usikkerheten om?</strong><p>Produktet elevene leverer, eller prosessen bak det?</p></div></li>
+      <li><div><strong>Hva trenger vi å se?</strong><p>Hva skulle dere trengt å se for å bli tryggere på at elevene er med, også når de bruker KI? På tavle 2: Hvilke dimensjoner fikk mange kort, og hvilke fikk få?</p></div></li>
+    </ol>
+  </section>
+
+  <section class="section lavender" aria-labelledby="h-egen">
+    <div class="kicker">Med egne elever</div>
+    <h2 id="h-egen">Lag din egen tavle</h2>
+    <div class="copy"><p>Aktiviteten virker med alle verktøy der elevene kan skrive korte svar som dere ser samlet. Bruk verktøyene skolen har avtale om, og logg inn med skolekontoen.</p></div>
+    <ul class="cards">
+      <li class="card"><strong>Microsoft Whiteboard i Teams</strong>Elevene legger lapper på en felles tavle, og dere flytter dem inn i kolonner sammen.</li>
+      <li class="card"><strong>Microsoft Forms</strong>Ett åpent spørsmål og en QR-kode. Svarene samles i Excel og kan vises på skjermen.</li>
+      <li class="card"><strong>TaskCards eller Padlet</strong>Når skolen har avtale: én kolonne per setning eller per kategori.</li>
+      <li class="card"><strong>Uten skjerm</strong>Lapper og en vegg gjør samme nytten. Det viktigste er samtalen etterpå.</li>
+    </ul>
+    <p class="note">Tavlene til fagdagen ligger i NTNUs TaskCards, som NTNU har databehandleravtale for. Skriv uten navn. Etter fagdagen settes tavlene til bare lesing.</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="signature" href="../index.html">Når KI er i rommet</a>
+    <p class="footer-info">
+      Mari-Ann Letnes &nbsp;·&nbsp; Institutt for lærerutdanning, NTNU &nbsp;·&nbsp; <a href="mailto:mari.ann.letnes@ntnu.no">mari.ann.letnes@ntnu.no</a><br>
+      Elevstemmene er fiktive &nbsp;·&nbsp; <a href="https://mariannletnes.com">mariannletnes.com</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
