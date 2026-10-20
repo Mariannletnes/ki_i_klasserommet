@@ -572,7 +572,7 @@ a{color:inherit}
   background:var(--marine);color:var(--on-dark);display:flex;align-items:center;justify-content:center;
   font-family:var(--serif);font-weight:300;font-size:1.5rem;border:3px solid #fff;z-index:1;
 }
-.bolk-body{padding:2.2rem 1.6rem 1.5rem;display:flex;flex-direction:column;flex:1}
+.bolk-body{padding:1.6rem 1.6rem 1.5rem;display:flex;flex-direction:column;flex:1}
 .bolk-body .tag{
   font-size:.75rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;
   color:var(--forest-ink);margin-bottom:.6rem;line-height:1.5;

@@ -8,8 +8,9 @@ MAPPESTRUKTUR
   index.html                     Forsiden: de fire bolkene og verktøyene
   bolk-1-engasjement.html        Bolk 1: Engasjement med KI-blikk
   bolk-2-elevstemmer.html        Bolk 2: Elevenes stemmer, samtalen om støtte eller erstatning
-  bolk-3-design.html             Bolk 3: Design for læring, bygg og prøv en KI-agent
-  bolk-4-vurdering.html          Bolk 4: Vurdering, tegn på læring og metasamtalen
+  bolk-3-design.html             Bolk 3: Design og vurdering i eget fag
+  bolk-4-verksted.html           Bolk 4: Verksted, bygg og prøv en KI-agent, og metasamtalen
+  bolk-4-vurdering.html          Gammel adresse, sender videre til vurderingsdelen i bolk 3
   stil.css                       Felles stil for sidene øverst i mappen
   ikon.svg                       Ikonet i nettleserfanen
 

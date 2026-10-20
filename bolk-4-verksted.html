@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolk 4: Verksted — Når KI er i rommet</title>
+<meta name="description" content="Verksted: bygg en KI-agent i Copilot, prøv den i elevrollen, juster den etter tre designprinsipper og prøv metasamtalen.">
+<meta property="og:title" content="Bolk 4: Verksted">
+<meta property="og:description" content="Verksted: bygg en KI-agent i Copilot, prøv den i elevrollen, juster den etter tre designprinsipper og prøv metasamtalen.">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#1E2A45">
+<link rel="icon" type="image/svg+xml" href="ikon.svg">
+<link rel="stylesheet" href="stil.css">
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Hovedmeny">
+  <div class="nav-inner">
+    <a class="signature" href="index.html">Når KI er i rommet</a>
+    <ul class="nav-links">
+      <li><a href="bolk-1-engasjement.html">Engasjement</a></li>
+      <li><a href="bolk-2-elevstemmer.html">Elevstemmer</a></li>
+      <li><a href="bolk-3-design.html">Design</a></li>
+      <li><a href="bolk-4-verksted.html" aria-current="page">Verksted</a></li>
+      <li><a href="index.html#verktoy">Verktøy</a></li>
+      <li><a href="https://mariannletnes.com" class="sub">Mari-Ann Letnes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero post">
+  <div class="hero-inner solo">
+    <p class="kicker">Bolk 4 av 4</p>
+    <h1>Verksted: <em>prøv det ut</em></h1>
+    <p class="hero-desc">Her bygger dere en KI-agent elevene kan lære med, prøver den i elevrollen og justerer den etter det dere ser.</p>
+  </div>
+</header>
+
+<main>
+
+<div class="wrap">
+  <div class="prose col">
+    <h2>Prøv det ut</h2>
+    <p>I verkstedet bygger dere en KI-agent til forløpet fra bolk 3, prøver den i elevrollen og justerer den etter det dere ser. Til slutt prøver dere metasamtalen med en elev som har brukt agenten.</p>
+    <div class="callout">
+      <p class="label">Ta med fra bolk 3</p>
+      <ul>
+        <li><strong>Læringsmålet:</strong> hva elevene skal forstå eller kunne etter forløpet.</li>
+        <li><strong>Plassen i forløpet:</strong> iscenesetting, transformering, representasjon eller metarefleksjon.</li>
+        <li><strong>Tegnene:</strong> det dere vil se etter underveis, i sporene og i det eleven setter ord på.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="band band-lin" aria-labelledby="verksted">
+  <div class="inner">
+    <p class="section-label">Verkstedet · ca. 70 minutter</p>
+    <h2 class="section-heading" id="verksted">Bygg, prøv og juster en agent</h2>
+    <p class="section-intro">Arbeid to og to, gjerne med en kollega fra samme fag. Målet er en agent elevene kan lære med, og en begrunnelse for hvordan den er laget.</p>
+
+    <div class="step step-wide"><span class="n">1</span><div>
+      <h3>Skriv instruksen <span class="time">ca. 15 min</span></h3>
+      <p>Fyll inn fag, trinn, produkt, tema og mottaker, velg fase og kopier instruksen inn i Copilot under «Opprett agent». Gi agenten et navn elevene forstår.</p>
+      <div class="downloads"><a class="row-link" href="verktoy/bygg-en-faseagent.html"><div><p class="tag">Verktøy</p><h3>Bygg en faseagent</h3><p>Tilpass instruksen til ditt fag, lag agenten i Copilot og test den.</p></div><svg viewBox="0 0 20 20" fill="none" stroke-width="1.5" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a></div>
+    </div></div>
+
+    <div class="step step-wide"><span class="n">2</span><div>
+      <h3>Prøv agenten i elevrollen <span class="time">ca. 20 min</span></h3>
+      <p>Den ene spiller elev, den andre følger med. Bytt etter ti minutter.</p>
+      <p class="step-sub">Fire elevroller</p>
+      <ol class="flow">
+        <li><strong>Eleven som er ny i stoffet.</strong> Hen skjønner lite av temaet og trenger en vei inn.</li>
+        <li><strong>Eleven som vil ha alt ferdig.</strong> Hen ber agenten lage hele produktet.</li>
+        <li><strong>Gruppa som går lei.</strong> Den svarer «ok» og «vet ikke» flere ganger på rad.</li>
+        <li><strong>Gruppa som har spurt en annen KI.</strong> Den kommer med en påstand og spør om den stemmer.</li>
+      </ol>
+      <p class="step-sub">Den som følger med, ser etter</p>
+      <ul class="qs">
+        <li>Hvem tenker i samtalen, eleven eller agenten?</li>
+        <li>Hva gjør eleven med det agenten gir?</li>
+        <li>Når hjelper spørsmålene eleven videre, og når stopper de eleven opp?</li>
+      </ul>
+    </div></div>
+
+    <div class="step step-wide"><span class="n">3</span><div>
+      <h3>Juster agenten <span class="time">ca. 15 min</span></h3>
+      <p>Bruk tre designprinsipper som kriterier. Endre én ting i instruksen, og prøv igjen med samme elevrolle.</p>
+      <div class="card-grid">
+        <div class="card static"><p class="tag">Prinsipp 1</p><h3>Gjør arbeidet synlig</h3><p>Ber agenten eleven sette ord på spørsmål, valg og begrunnelser underveis?</p></div>
+        <div class="card static"><p class="tag">Prinsipp 2</p><h3>Kalibrer friksjonen</h3><p>Krever agenten tolkning, og gir den nok forklaring til at eleven kommer videre?</p></div>
+        <div class="card static"><p class="tag">Prinsipp 3</p><h3>Gi KI en avgrenset plass</h3><p>Sender agenten eleven videre til medelever, kilder og læreren?</p></div>
+      </div>
+    </div></div>
+
+    <div class="step step-wide"><span class="n">4</span><div>
+      <h3>Prøv metasamtalen <span class="time">ca. 10 min</span></h3>
+      <p>Den ene er elev som har brukt agenten, den andre er lærer. Bytt etter fem minutter.</p>
+      <ul class="qs">
+        <li>Hva gjorde du selv, og hva gjorde KI?</li>
+        <li>Hvilket forslag valgte du bort, og hvorfor?</li>
+        <li>Hvilken del av arbeidet kan du forklare uten notater?</li>
+        <li>Hva forstår du annerledes nå enn da du startet?</li>
+      </ul>
+      <p class="tip"><strong>Etterpå:</strong> Hva fikk du vite i samtalen som produktet viste lite av?</p>
+    </div></div>
+
+    <div class="step step-wide"><span class="n">5</span><div>
+      <h3>Del med de andre <span class="time">ca. 10 min</span></h3>
+      <p>Hvert par viser én endring de gjorde, og begrunner den.</p>
+      <ul class="qs">
+        <li>Hva så dere i elevrollen som fikk dere til å endre instruksen?</li>
+        <li>Hvilken læringsprosess inviterer agenten til nå?</li>
+        <li>Hvilke tegn på læring kan agenten hjelpe dere å få øye på?</li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="prose col">
+    <div class="related">
+      <p class="label">Videre</p>
+      <a href="index.html"><span class="when">Oversikt</span><h3>Tilbake til alle fire bolkene</h3></a>
+      <a href="bolk-3-design.html"><span class="when">Bolk 3</span><h3>Tilbake til design og vurdering</h3></a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="signature" href="index.html">Når KI er i rommet</a>
+    <p class="footer-info">
+      Mari-Ann Letnes &nbsp;·&nbsp; Institutt for lærerutdanning, NTNU &nbsp;·&nbsp; <a href="mailto:mari.ann.letnes@ntnu.no">mari.ann.letnes@ntnu.no</a><br>
+      Elevstemmene er fiktive &nbsp;·&nbsp; <a href="https://mariannletnes.com">mariannletnes.com</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
