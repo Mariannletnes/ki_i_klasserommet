@@ -9,6 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="../ikon.svg">
 <link rel="stylesheet" href="verktoy.css">
 <script src="../js/jspdf.umd.min.js"></script>
+<script src="fag.js"></script>
 <style>
 
 /* Skriftene ligger lokalt i fonts/, så ingen besøkende sendes videre til Google. */
@@ -391,6 +392,23 @@ body{background:var(--cream);color:var(--text-soft)}
 @media (max-width:720px){#card{scroll-margin-top:12px}}
 @media (max-width:620px){.tool-wrap{padding-inline:16px}.tool-intro{margin-top:-1.6rem}}
 
+/* Fagvalg og fageksempel */
+.fag-row{margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
+.fag-row .fag-label{display:block;font-size:.86rem;text-transform:uppercase;letter-spacing:.08em;font-weight:500;color:var(--plum);margin-bottom:9px}
+.fag-buttons{display:flex;flex-wrap:wrap;gap:7px}
+.fag-buttons button{border:1px solid var(--hair);background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:.92rem;display:inline-flex;align-items:center;gap:7px}
+.fag-buttons button i{width:9px;height:9px;border-radius:50%;background:var(--fc);display:inline-block}
+.fag-buttons button:hover{border-color:var(--fc)}
+.fag-buttons button[aria-pressed=true]{background:var(--fc);border-color:var(--fc);color:#fff}
+.fag-buttons button[aria-pressed=true] i{background:#fff}
+.fag-ex{margin:0 0 18px;padding:14px 16px;background:#fff;border:1px solid var(--hair);border-left:4px solid var(--fc);border-radius:0 12px 12px 0;max-width:62ch}
+.fag-ex-label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;font-weight:500;color:var(--fc);margin-bottom:4px}
+.fag-ex p{font-size:1rem;line-height:1.55;color:var(--ink)}
+.fag-mal-label{margin-top:12px}
+.fag-mal-label a{color:inherit}
+.fag-mal{margin:4px 0 0;padding-left:18px}
+.fag-mal li{font-family:var(--serif);font-style:italic;font-weight:300;font-size:1rem;line-height:1.5;color:var(--ink);margin-bottom:4px}
+.fag-mal li::marker{color:var(--fc)}
 </style>
 </head>
 <body>
@@ -422,7 +440,8 @@ body{background:var(--cream);color:var(--text-soft)}
 <div class="wrap tool-wrap">
   <div class="intro tool-intro">
     <p>Snakk sammen i faggruppa om hvert punkt før dere skriver. Det dere blir enige om, skriver dere her. Hvert steg har også et spørsmål om hvilken plass KI skal ha.</p>
-    <p class="tool-source">Bygger på Selander &amp; Kress (2010) og Letnes (under utgivelse).</p>
+    <p class="tool-source">Bygger på Selander &amp; Kress (2012) og Letnes (under utgivelse).</p>
+    <div class="fag-row"><span class="fag-label" id="fagLabel">Velg fag for eksempler</span><div class="fag-buttons" id="fagRow" role="group" aria-labelledby="fagLabel"></div></div>
     <div class="module-row">
       <label for="moduleName">Hvilket fag og tema planlegger dere?</label>
       <input id="moduleName" placeholder="For eksempel: Norsk vg1, argumenterende tekster">
@@ -775,10 +794,18 @@ body{background:var(--cream);color:var(--text-soft)}
       y += 2;
     }
 
+    if (fag && FAG && FAG[fag]){
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      var ml = doc.splitTextToSize('Kompetansemål (' + FAG[fag].plan.kode + ', ' + FAG[fag].plan.trinn + '): ' + FAG[fag].mal.map(function(m){ return '«' + m + '»'; }).join(' '), maxWidth);
+      for (var mi = 0; mi < ml.length; mi++){ doc.text(ml[mi], margin, y); y += 5; }
+      y += 3;
+    }
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.setTextColor(120, 120, 120);
-    doc.text('Basert på Selander & Kress (2010), Design för lärande, og Letnes (under utgivelse)', margin, y);
+    doc.text('Basert på Selander & Kress (2012), Design för lärande, og Letnes (under utgivelse)', margin, y);
     doc.setTextColor(20, 20, 20);
     y += 14;
 
@@ -828,7 +855,7 @@ body{background:var(--cream);color:var(--text-soft)}
   function downloadAsTxt(){
     var lines = ['Design for læring med KI — vår plan'];
     if (moduleName.trim() !== ''){ lines.push('Fag og tema: ' + moduleName.trim()); }
-    lines.push('Basert på Selander & Kress (2010)', '');
+    lines.push('Basert på Selander & Kress (2012)', '');
     for (var i = 0; i < steps.length; i++){
       var s = steps[i];
       lines.push(s.kicker + ' — ' + s.title);
@@ -909,6 +936,22 @@ body{background:var(--cream);color:var(--text-soft)}
     kiBox.appendChild(kiLabel);
     kiBox.appendChild(kiText);
 
+    if (fag && FAG[fag] && FAG[fag].ex[current]){
+      var ex = document.createElement('div'); ex.className = 'fag-ex'; ex.style.setProperty('--fc', FAG[fag].farge);
+      var exL = document.createElement('span'); exL.className = 'fag-ex-label'; exL.textContent = 'Eksempel fra ' + FAG[fag].navn.toLowerCase() + ': ' + FAG[fag].tema.charAt(0).toLowerCase() + FAG[fag].tema.slice(1);
+      var exP = document.createElement('p'); exP.textContent = FAG[fag].ex[current];
+      ex.appendChild(exL); ex.appendChild(exP);
+      if (current === 0 && FAG[fag].mal){
+        var mt = document.createElement('span'); mt.className = 'fag-ex-label fag-mal-label';
+        mt.appendChild(document.createTextNode('Kompetansemål (' + FAG[fag].plan.trinn + ', '));
+        var pa = document.createElement('a'); pa.href = FAG[fag].plan.url; pa.target = '_blank'; pa.rel = 'noopener'; pa.textContent = FAG[fag].plan.kode;
+        mt.appendChild(pa); mt.appendChild(document.createTextNode(')'));
+        var ml = document.createElement('ul'); ml.className = 'fag-mal';
+        FAG[fag].mal.forEach(function(m){ var li = document.createElement('li'); li.textContent = '«' + m + '»'; ml.appendChild(li); });
+        ex.appendChild(mt); ex.appendChild(ml);
+      }
+      inputArea.appendChild(ex);
+    }
     inputArea.appendChild(promptEl);
     inputArea.appendChild(kiBox);
     inputArea.appendChild(ta);
@@ -937,8 +980,36 @@ body{background:var(--cream);color:var(--text-soft)}
     render();
   });
 
+  /* ============ Fagvalg ============ */
+  function renderFag(){
+    var row = document.getElementById('fagRow');
+    if (!row || !FAG) return;
+    row.innerHTML = '';
+    FAG_ORDER.forEach(function(k){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.style.setProperty('--fc', FAG[k].farge);
+      b.setAttribute('aria-pressed', String(k === fag));
+      var dot = document.createElement('i'); dot.setAttribute('aria-hidden', 'true');
+      b.appendChild(dot); b.appendChild(document.createTextNode(FAG[k].navn));
+      b.addEventListener('click', function(){
+        fag = (fag === k) ? '' : k;
+        try{ fag ? localStorage.setItem('nkir-fag', fag) : localStorage.removeItem('nkir-fag'); }catch(e){}
+        try{ var u = new URL(location.href); fag ? u.searchParams.set('fag', fag) : u.searchParams.delete('fag'); history.replaceState(null, '', u.pathname + u.search + u.hash); }catch(e){}
+        renderFag(); render();
+      });
+      row.appendChild(b);
+    });
+    moduleInput.placeholder = (fag && FAG[fag]) ? FAG[fag].plassholder : 'For eksempel: Norsk vg1, argumenterende tekster';
+  }
+  var FAG = window.VGS_FAG || null, FAG_ORDER = window.VGS_FAG_ORDER || [], fag = '';
+  try{ fag = new URLSearchParams(location.search).get('fag') || localStorage.getItem('nkir-fag') || ''; }catch(e){}
+  if (!FAG || !FAG[fag]) fag = '';
+  try{ if (fag) localStorage.setItem('nkir-fag', fag); }catch(e){}
+
   loadSaved();
   moduleInput.value = moduleName;
+  renderFag();
   render();
 </script>
 </body>

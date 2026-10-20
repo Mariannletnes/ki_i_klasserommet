@@ -4,13 +4,102 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bolk 3: Design og vurdering i eget fag — Når KI er i rommet</title>
-<meta name="description" content="Hvordan designe for engasjement når KI er tilgjengelig? Læring som transformasjon, plass for KI i forløpet og flere tegn på læring enn produktet.">
+<meta name="description" content="Hvordan designe for engasjement når KI er tilgjengelig? Den doble åpningen, Selander og Kress’ modell for en læringssekvens, og planlegging med eksempler fra åtte fag på videregående.">
 <meta property="og:title" content="Bolk 3: Design og vurdering i eget fag">
-<meta property="og:description" content="Hvordan designe for engasjement når KI er tilgjengelig? Læring som transformasjon, plass for KI i forløpet og flere tegn på læring enn produktet.">
+<meta property="og:description" content="Hvordan designe for engasjement når KI er tilgjengelig? Den doble åpningen, Selander og Kress’ modell for en læringssekvens, og planlegging med eksempler fra åtte fag på videregående.">
 <meta property="og:type" content="article">
 <meta name="theme-color" content="#1E2A45">
 <link rel="icon" type="image/svg+xml" href="ikon.svg">
 <link rel="stylesheet" href="stil.css">
+
+<style>
+/* Selander og Kress, interaktiv modell. Fra DigSkole-ressursen, i nettstedets farger. */
+.sk-interactive{background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-lg);overflow:hidden;margin-top:.4rem}
+.sk-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:1.1rem 1.4rem;background:var(--lin);border-bottom:1px solid var(--lin-dark)}
+.sk-toolbar-title{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.sk-tiny{font-size:.72rem;color:var(--forest-ink);font-weight:500;letter-spacing:.14em}
+.sk-toolbar-title strong{font-size:.92rem;font-weight:500;color:var(--text)}
+.sk-controls{display:flex;gap:8px}
+.sk-control{border:1px solid var(--lin-dark);border-radius:999px;background:#fff;color:var(--marine);cursor:pointer;font:500 .88rem var(--sans);padding:.55rem 1.1rem}
+.sk-control:disabled{opacity:.36;cursor:default}
+.sk-control:not(:disabled):hover{border-color:var(--mauve)}
+.sk-control-primary{background:var(--marine);color:var(--on-dark);border-color:var(--marine)}
+.sk-control-primary:not(:disabled):hover{background:var(--plum);border-color:var(--plum)}
+.sk-step-tabs{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-bottom:1px solid var(--lin-dark)}
+.sk-step-tab{border:0;border-right:1px solid var(--lin-dark);border-bottom:3px solid transparent;background:none;text-align:left;cursor:pointer;padding:.9rem 1rem;color:var(--text-soft);font:400 .88rem/1.45 var(--sans)}
+.sk-step-tab:last-child{border-right:0}
+.sk-step-tab span{color:var(--mauve-ink);margin-right:8px;font-weight:500;letter-spacing:.04em}
+.sk-step-tab[aria-pressed=true]{color:var(--text);border-bottom-color:var(--mauve);background:#F5ECF0;font-weight:500}
+.sk-step-tab:hover{background:var(--cream)}
+.sk-visual-scroll{width:100%;overflow-x:auto;background:var(--cream)}
+.sk-diagram{display:block;width:100%;min-width:1060px;height:auto}
+.sk-diagram text{font-family:var(--sans);fill:#1E2A45}
+.sk-diagram .sk-svg-small-label{font-size:14px;font-weight:500;letter-spacing:1.2px}
+.sk-diagram .sk-svg-helper{font-size:13px;fill:#3f554e}
+.sk-diagram .sk-svg-kicker{font-size:11.5px;font-weight:500;letter-spacing:.6px;fill:#4A5A53}
+.sk-diagram .sk-svg-mauve{fill:#7E4A62}
+.sk-diagram .sk-svg-white{fill:#FFFFFF}
+.sk-diagram .sk-svg-cycle{font-size:14px;font-weight:500;letter-spacing:.7px;fill:#476557}
+.sk-diagram .sk-svg-heading{font-size:16px;font-weight:500}
+.sk-diagram .sk-svg-body{font-size:15px;font-weight:400}
+.sk-diagram .sk-svg-minor{font-size:12px;fill:#4A4D59}
+.sk-diagram [data-sk-reveal]{opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}
+.sk-diagram [data-sk-reveal].sk-visible{opacity:1;visibility:visible}
+.sk-hotspot{cursor:help;outline:none}
+.sk-hit-area{fill:transparent;pointer-events:all;stroke:transparent;stroke-width:2.5px;transition:fill .15s ease,stroke .15s ease}
+.sk-hotspot:hover .sk-hit-area,.sk-hotspot:focus-visible .sk-hit-area,.sk-hotspot.sk-selected .sk-hit-area{fill:rgba(176,122,147,.11);stroke:rgba(176,122,147,.85)}
+.sk-glossary{background:#EEF1EE;border-top:1px solid #D6E0D8;border-bottom:1px solid #D6E0D8;padding:1.1rem 1.4rem 1.3rem}
+.sk-glossary-top{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.sk-glossary-kicker{font-size:.72rem;letter-spacing:.14em;font-weight:500;color:#4A5A53}
+.sk-glossary-hint{font-size:.8rem;color:var(--text-pale)}
+.sk-glossary h3{color:var(--text);font:300 1.4rem/1.3 var(--serif);margin:.5rem 0 .4rem}
+.sk-glossary p{font-size:.95rem;line-height:1.7;margin:0;color:var(--text-soft);max-width:54rem}
+.sk-caption{padding:.7rem 1.4rem .8rem;font-size:.8rem;color:var(--text-pale);background:var(--cream);border-bottom:1px solid var(--lin-dark);line-height:1.6}
+.sk-reading{display:grid;grid-template-columns:1.4fr 1fr;gap:1.6rem;padding:1.7rem 1.6rem}
+.sk-reading-kicker,.sk-question span{font-size:.72rem;font-weight:500;letter-spacing:.14em;color:var(--mauve-ink)}
+.sk-reading h3{font:300 1.65rem/1.25 var(--serif);margin:.5rem 0 .7rem;color:var(--text)}
+.sk-reading p{color:var(--text-soft);font-size:1rem;line-height:1.75;margin:0}
+.sk-question{padding:1.2rem 1.3rem;background:#F5ECF0;border-left:3px solid var(--mauve);border-radius:4px var(--radius-sm) var(--radius-sm) 4px}
+.sk-question p{margin-top:.5rem;color:var(--text)}
+.sk-slide-note{font-size:.8rem;padding:0 1.6rem 1.4rem;color:var(--text-pale)}
+@media(max-width:780px){
+  .sk-toolbar{align-items:flex-start;flex-direction:column;padding:1rem}
+  .sk-controls{width:100%}.sk-control{flex:1}
+  .sk-step-tabs{grid-template-columns:repeat(2,1fr)}
+  .sk-step-tab{padding:.7rem;font-size:.8rem}
+  .sk-reading{grid-template-columns:1fr;padding:1.2rem;gap:1rem}
+  .sk-diagram{width:1060px}
+  .sk-reading h3{font-size:1.45rem}
+}
+@media(prefers-reduced-motion:reduce){.sk-diagram [data-sk-reveal],.sk-hit-area{transition:none}}
+@media print{.sk-visual-scroll{overflow:visible}.sk-diagram [data-sk-reveal]{opacity:1!important;visibility:visible!important}.sk-toolbar,.sk-step-tabs,.sk-slide-note{display:none}.sk-diagram{min-width:0}}
+
+/* Dobbel åpning */
+.aapning{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.4rem}
+.aapning > div{background:#fff;border:1px solid var(--lin-dark);border-radius:var(--radius-lg);padding:1.5rem 1.6rem;border-top:4px solid var(--c)}
+.aapning .tag{font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin-bottom:.5rem}
+.aapning h3{font-family:var(--serif);font-weight:300;font-size:1.45rem;line-height:1.25;color:var(--text);margin-bottom:.6rem}
+.aapning p{font-size:1rem;line-height:1.7;color:var(--text-soft)}
+.aapning-linje{margin-top:1.4rem;font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.3rem;line-height:1.45;color:var(--mauve-ink);max-width:44rem}
+
+/* Fagvalg */
+.fagvalg{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 1rem}
+.fagvalg button{border:1px solid var(--lin-dark);background:#fff;color:var(--text);border-radius:999px;padding:.5rem 1rem;font:400 .92rem var(--sans);cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.fagvalg button i{width:9px;height:9px;border-radius:50%;background:var(--c);display:inline-block}
+.fagvalg button:hover{border-color:var(--c)}
+.fagvalg button[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#fff}
+.fagvalg button[aria-pressed=true] i{background:#fff}
+.fagpanel{background:#fff;border:1px solid var(--lin-dark);border-left:4px solid var(--c,var(--mauve));border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:1.1rem 1.3rem;margin-bottom:1rem}
+.fagpanel .tag{font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--c,var(--mauve-ink));margin-bottom:.3rem}
+.fagpanel h4{font-family:var(--serif);font-weight:300;font-size:1.3rem;color:var(--text);margin:0 0 .4rem}
+.fagpanel p{font-size:.98rem;line-height:1.65;color:var(--text-soft);margin:0}
+.fagpanel .fagmal-tittel{margin-top:.9rem;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-pale)}
+.fagpanel .fagmal-tittel a{color:var(--c);text-decoration:none;border-bottom:1px solid currentColor}
+.fagmal{margin:.4rem 0 0;padding-left:1.1rem}
+.fagmal li{font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.02rem;line-height:1.5;color:var(--text);margin-bottom:.3rem}
+.fagmal li::marker{color:var(--c)}
+@media(max-width:700px){.aapning{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
@@ -32,7 +121,7 @@
   <div class="hero-inner solo">
     <p class="kicker">Bolk 3 av 4</p>
     <h1>Design og <em>vurdering</em> i eget fag</h1>
-    <p class="hero-desc">Hvordan designe for engasjement når KI er tilgjengelig? Her bestemmer dere hvor KI skal stå i forløpet, og hvilke tegn på læring dere vil se etter.</p>
+    <p class="hero-desc">Hvordan designe for engasjement når KI er tilgjengelig? Her bestemmer dere hvor KI skal stå i forløpet, og hvilke tegn på læring dere vil se etter, med eksempler fra ditt fag.</p>
   </div>
 </header>
 
@@ -41,17 +130,164 @@
 <div class="wrap">
   <div class="prose col">
     <h2>Læring som transformasjon</h2>
-    <p>Eleven møter noe i verden og gjør det om til egne begreper og uttrykk. Et godt design støtter den bevegelsen og lar den skje hos eleven, også når KI er tilgjengelig. Selander og Kress’ modell for en læringssekvens hjelper dere å bestemme hvor i forløpet KI skal stå.</p>
-    <div class="callout">
-      <p class="label">Fire steder KI kan stå i forløpet</p>
-      <ul>
-        <li><strong>Iscenesetting:</strong> å åpne fagstoffet. Hva skal elevene møte, og hvilken plass får KI?</li>
-        <li><strong>Transformering:</strong> å arbeide med stoffet. Hva undersøker, tolker og omformer eleven selv?</li>
-        <li><strong>Representasjon:</strong> å gi forståelsen form. Hvordan viser eleven det hen har forstått?</li>
-        <li><strong>Metarefleksjon:</strong> å vende tilbake. Hvordan begrunner eleven valgene sine og KI-bidragene?</li>
-      </ul>
-    </div>
+    <p>For Kress er læring en transformativ bevegelse som forutsetter engasjement. Et møte med noe i verden fanger oppmerksomheten, og eleven omformer det til egne begreper og uttrykk. Tre ting blir viktige å holde styr på:</p>
+    <ul>
+      <li><strong>Hva miljøet tilbyr:</strong> ressursene, verktøyene og oppgavene, og KI er én av dem.</li>
+      <li><strong>Hva som fanger interessen:</strong> det som akkurat nå får eleven til å svare, spørre og gå inn i arbeidet.</li>
+      <li><strong>Selve omformingen:</strong> det eleven gjør med stoffet, og som blir til noe nytt.</li>
+    </ul>
+    <p>Når KI er tilgjengelig, handler design om hvor i forløpet KI får stå, og hvilket arbeid som blir liggende hos eleven.</p>
+  </div>
+</div>
 
+<section class="band band-lin" aria-labelledby="dobbel-aapning">
+  <div class="inner">
+    <p class="section-label">Klafki (2001, 2016) · Den doble åpningen</p>
+    <h2 class="section-heading" id="dobbel-aapning">Når KI er en tredje part i den doble åpningen</h2>
+    <p class="section-intro">KI kan åpne fagstoffet for eleven. Spørsmålet er om eleven får åpne seg mot det.</p>
+    <div class="aapning">
+      <div style="--c:var(--forest-ink)"><p class="tag">Fagstoffet åpnes for eleven</p><h3>Læreren, og KI, gjør innholdet tilgjengelig</h3><p>Læreren finner det sentrale i innholdet, velger eksempler og representasjoner og skaper muligheter for forståelse. KI kan forklare, forenkle, gi eksempler og gi oversikt.</p></div>
+      <div style="--c:var(--mauve-ink)"><p class="tag">Eleven åpner seg for fagstoffet</p><h3>Eleven bearbeider og gjør det til sitt</h3><p>Eleven tolker, vurderer, omformer og står inne for kunnskapen, og gjør innholdet meningsfullt i sitt eget kunnskapsarbeid.</p></div>
+    </div>
+    <p class="aapning-linje">Ferdige svar kan åpne innholdet, men snevre inn arbeidet som gjør det til elevens eget.</p>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="modellen">
+  <div class="inner">
+    <p class="section-label">Selander og Kress (2012) · Design for læring</p>
+    <h2 class="section-heading" id="modellen">En læringsprosess som tar form</h2>
+    <p class="section-intro">Klikk deg gjennom modellen slik den ble bygd opp på fagdagen: fra rammene rundt sekvensen og lærerens iscenesetting til transformasjon, representasjon, refleksjon og vurdering. Hver del har et spørsmål om KI til faggruppa.</p>
+    
+<div class="sk-interactive" id="sk-model" aria-label="Interaktiv modell av en formell læringssekvens">
+<div class="sk-toolbar">
+  <div class="sk-toolbar-title"><span class="sk-tiny">MODELLEN BYGGES OPP</span><strong id="sk-progress">1 av 5</strong></div>
+  <div class="sk-controls"><button type="button" id="sk-back" class="sk-control" aria-label="Forrige del">← Forrige</button><button type="button" id="sk-next" class="sk-control sk-control-primary">Neste del →</button></div>
+</div>
+<div class="sk-step-tabs" role="group" aria-label="Velg del av modellen">
+<button type="button" class="sk-step-tab" data-sk-step="0" aria-pressed="true"><span>01</span> Rammer</button>
+<button type="button" class="sk-step-tab" data-sk-step="1" aria-pressed="false"><span>02</span> Første syklus</button>
+<button type="button" class="sk-step-tab" data-sk-step="2" aria-pressed="false"><span>03</span> Representasjon</button>
+<button type="button" class="sk-step-tab" data-sk-step="3" aria-pressed="false"><span>04</span> Andre syklus</button>
+<button type="button" class="sk-step-tab" data-sk-step="4" aria-pressed="false"><span>05</span> Vurdering</button>
+</div>
+<div class="sk-visual-scroll" role="region" aria-label="Illustrasjon av læringssekvensen. Kan rulles sidelengs på smal skjerm." tabindex="0">
+<svg class="sk-diagram" viewBox="0 0 1280 560" width="1280" height="560" role="group" aria-labelledby="sk-diagram-title sk-diagram-description" xmlns="http://www.w3.org/2000/svg">
+<title id="sk-diagram-title">Design av en formell læringssekvens etter Selander og Kress</title>
+<desc id="sk-diagram-description">En prosessmodell med rammer og mulige ressurser, iscenesetting som inngang til første transformasjonssyklus, elevens bearbeiding og representasjon, andre transformasjonssyklus med diskusjon og metarefleksjon, og lærerens intervensjoner underveis. Modellen bygges opp i fem trinn.</desc>
+<defs>
+ <marker id="sk-arrow" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto-start-reverse"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#5e6e67" stroke-width="1.5"/></marker>
+ <marker id="sk-arrow-rose" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto-start-reverse"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#B07A93" stroke-width="1.5"/></marker>
+ <linearGradient id="sk-sage" x1="0" x2="1"><stop stop-color="#5e6e67"/><stop offset="1" stop-color="#8FA79B"/></linearGradient>
+</defs>
+<!-- Samspillet mellom elev, rammer og lærer løper gjennom hele sekvensen -->
+<rect x="218" y="12" width="950" height="49" rx="10" fill="#e1e8e2"/>
+<text x="244" y="32" class="sk-svg-small-label">ELEVENES POSISJONERING, INTERESSE OG SOSIALE INTERAKSJON</text>
+<text x="244" y="50" class="sk-svg-helper">Påvirker valg, deltakelse og meningsskaping gjennom hele forløpet</text>
+<g class="sk-hotspot" data-sk-tip="eleven" tabindex="0" role="button" aria-label="Forklaring: Elevenes posisjonering, interesser og sosiale interaksjon"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="218" y="12" width="950" height="49" rx="10"/></g>
+<path d="M260 64 V86 M530 64 V86 M800 64 V86 M1090 64 V86" stroke="#8ca599" stroke-dasharray="3 6" stroke-width="2"/>
+<!-- Faglige og institusjonelle betingelser -->
+<text x="25" y="142" class="sk-svg-kicker">RAMMER FOR SEKVENSEN</text>
+<polygon points="24,165 24,395 205,280" fill="#d4e2de" stroke="#a3bcb4" stroke-width="2"/>
+<text x="40" y="235" class="sk-svg-body">Potensielle</text>
+<text x="40" y="255" class="sk-svg-body">ressurser</text>
+<text x="40" y="292" class="sk-svg-body">Mål</text>
+<text x="40" y="332" class="sk-svg-body">Institusjonelle</text>
+<text x="40" y="352" class="sk-svg-body">mønstre</text>
+<text x="28" y="420" class="sk-svg-minor">Tegn, medier, materialer, verktøy, normer og rutiner</text>
+<g class="sk-hotspot" data-sk-tip="rammer" tabindex="0" role="button" aria-label="Forklaring: Rammer"><polygon class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" points="24,165 24,395 205,280"/></g>
+<g data-sk-reveal="1">
+<path d="M212 280 H245" fill="none" stroke="#5e6e67" stroke-width="3" marker-end="url(#sk-arrow)"/>
+<rect x="254" y="189" width="143" height="166" rx="15" fill="#FFFFFF" stroke="#B07A93" stroke-width="2"/>
+<rect x="255" y="190" width="141" height="37" rx="12" fill="#efe5ea"/>
+<text x="273" y="213" class="sk-svg-kicker sk-svg-mauve">ISCENESETTING</text>
+<text x="270" y="258" class="sk-svg-body">Fagstoff og</text><text x="270" y="279" class="sk-svg-body">oppgaver</text>
+<text x="270" y="310" class="sk-svg-minor">Læreren iscenesetter</text><text x="270" y="327" class="sk-svg-minor">et rom for læring</text>
+<g class="sk-hotspot" data-sk-tip="iscenesetting" tabindex="0" role="button" aria-label="Forklaring: Iscenesetting"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="254" y="189" width="143" height="166" rx="15"/></g>
+<path d="M398 280 H430" fill="none" stroke="#5e6e67" stroke-width="3" marker-end="url(#sk-arrow)"/>
+<!-- Den første transformasjonssyklusen: iscenesetting inngår i samme felt -->
+<rect x="245" y="108" width="625" height="292" rx="22" fill="none" stroke="#779889" stroke-width="2" stroke-dasharray="8 7"/>
+<text x="264" y="132" class="sk-svg-cycle">FØRSTE TRANSFORMASJONSSYKLUS</text>
+<text x="264" y="151" class="sk-svg-minor">Iscenesetting og elevenes bearbeiding av tilgjengelige ressurser</text>
+<rect x="434" y="183" width="245" height="172" rx="18" fill="#FAF9F7" stroke="#c8d6ca"/>
+<text x="454" y="206" class="sk-svg-kicker">TRANSFORMASJON</text>
+<path d="M484 236 A92 58 0 0 1 621 247" fill="none" stroke="#6E8C80" stroke-width="6" stroke-linecap="round" marker-end="url(#sk-arrow)"/>
+<path d="M614 299 A92 58 0 0 1 475 286" fill="none" stroke="#6E8C80" stroke-width="6" stroke-linecap="round" marker-end="url(#sk-arrow)"/>
+<text x="556" y="257" text-anchor="middle" class="sk-svg-heading">Anvendte</text>
+<text x="556" y="280" text-anchor="middle" class="sk-svg-heading">ressurser</text>
+<text x="556" y="341" text-anchor="middle" class="sk-svg-minor">Velge · prøve · omforme</text>
+<g class="sk-hotspot" data-sk-tip="transformasjon" tabindex="0" role="button" aria-label="Forklaring: Transformasjon"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="434" y="183" width="245" height="172" rx="18"/></g>
+</g>
+<!-- Behandling og representasjon kommer frem på klikk 3 -->
+<g data-sk-reveal="2">
+<path d="M681 280 H706" fill="none" stroke="#5e6e67" stroke-width="3" marker-end="url(#sk-arrow)"/>
+<rect x="716" y="220" width="160" height="118" rx="13" fill="#e8ece4" stroke="#b7cbb8"/>
+<text x="732" y="243" class="sk-svg-kicker">BEARBEIDING</text>
+<text x="732" y="273" class="sk-svg-body">Utprøving og</text><text x="732" y="294" class="sk-svg-body">omforming</text>
+<text x="732" y="318" class="sk-svg-minor">Utvikle forståelse</text>
+<g class="sk-hotspot" data-sk-tip="bearbeiding" tabindex="0" role="button" aria-label="Forklaring: Bearbeiding"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="716" y="220" width="160" height="118" rx="13"/></g>
+<path d="M858 345 C792 392 724 391 679 344" fill="none" stroke="#9AB2A7" stroke-width="3" stroke-dasharray="5 5" marker-end="url(#sk-arrow)"/>
+<path d="M878 280 H911" fill="none" stroke="#5e6e67" stroke-width="3" marker-end="url(#sk-arrow)"/>
+<rect x="922" y="216" width="147" height="126" rx="14" fill="#f1e5ea" stroke="#c9a0b0"/>
+<text x="937" y="240" class="sk-svg-kicker sk-svg-mauve">REPRESENTASJON</text>
+<text x="937" y="273" class="sk-svg-body">Gi forståelsen</text><text x="937" y="294" class="sk-svg-body">form</text>
+<text x="937" y="319" class="sk-svg-minor">Tekst, lyd, bilde …</text>
+<g class="sk-hotspot" data-sk-tip="representasjon" tabindex="0" role="button" aria-label="Forklaring: Representasjon"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="922" y="216" width="147" height="126" rx="14"/></g>
+</g>
+<!-- Andre transformasjonssyklus kommer frem på klikk 4 -->
+<g data-sk-reveal="3">
+<rect x="921" y="108" width="333" height="292" rx="21" fill="none" stroke="#B07A93" stroke-width="2" stroke-dasharray="8 7"/>
+<text x="939" y="132" class="sk-svg-cycle sk-svg-mauve">ANDRE TRANSFORMASJONSSYKLUS</text>
+<text x="939" y="151" class="sk-svg-minor">Presentasjon og metarefleksjon</text>
+<g class="sk-hotspot" data-sk-tip="andre_syklus" tabindex="0" role="button" aria-label="Forklaring: Andre transformasjonssyklus"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="937" y="111" width="300" height="52" rx="6"/></g>
+<path d="M1075 280 H1092" fill="none" stroke="#B07A93" stroke-width="3" marker-end="url(#sk-arrow-rose)"/>
+<rect x="1100" y="190" width="135" height="170" rx="15" fill="#FFFFFF" stroke="#d9c7cf"/>
+<text x="1116" y="218" class="sk-svg-kicker sk-svg-mauve">FORSTÅELSE</text>
+<text x="1116" y="257" class="sk-svg-body">Diskusjon</text><text x="1116" y="281" class="sk-svg-body">og refleksjon</text>
+<text x="1116" y="317" class="sk-svg-minor">Revidere og</text><text x="1116" y="335" class="sk-svg-minor">utvikle videre</text>
+<g class="sk-hotspot" data-sk-tip="refleksjon" tabindex="0" role="button" aria-label="Forklaring: Diskusjon og metarefleksjon"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="1100" y="190" width="135" height="170" rx="15"/></g>
+<path d="M1155 188 C1137 166 1049 168 1018 201" fill="none" stroke="#b18b9e" stroke-width="3" marker-end="url(#sk-arrow-rose)"/>
+<path d="M1150 360 C1098 390 1008 374 990 342" fill="none" stroke="#b18b9e" stroke-width="3" marker-end="url(#sk-arrow-rose)"/>
+</g>
+<!-- Lærerens deltakelse hele veien; vurderingsblikket tydeliggjøres i siste trinn -->
+<rect x="245" y="425" width="1009" height="50" rx="10" fill="url(#sk-sage)"/>
+<text x="267" y="445" class="sk-svg-small-label sk-svg-white">LÆRERENS POSISJONERING OG INTERVENSJON</text>
+<text x="267" y="465" class="sk-svg-helper sk-svg-white">Støtte, utfordre, forklare, stille spørsmål og gi rom for elevens faglige arbeid</text>
+<g class="sk-hotspot" data-sk-tip="larer" tabindex="0" role="button" aria-label="Forklaring: Lærerens posisjonering og intervensjon"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="245" y="425" width="1009" height="50" rx="10"/></g>
+<path d="M330 423 V398 M565 423 V398 M812 423 V398 M1120 423 V398" stroke="#8ca599" stroke-width="2" stroke-dasharray="3 5"/>
+<g data-sk-reveal="4">
+<!-- Formativ vurdering følger hele arbeidsprosessen. -->
+<rect x="245" y="488" width="679" height="62" rx="10" fill="#f2e4e9" stroke="#c9a0b0" stroke-width="1.5"/>
+<text x="265" y="514" class="sk-svg-small-label sk-svg-mauve">FORMATIV VURDERING · UNDERVEIS</text>
+<text x="265" y="536" class="sk-svg-helper">Observere · lytte · samtale · tolke · følge opp</text>
+<g class="sk-hotspot" data-sk-tip="formativ" tabindex="0" role="button" aria-label="Forklaring: Formativ vurdering"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="245" y="488" width="679" height="62" rx="10"/></g>
+<!-- Summativ vurdering bygger på et samlet og faglig relevant grunnlag. -->
+<rect x="934" y="488" width="320" height="62" rx="10" fill="#e8e3e7" stroke="#b9a3b2" stroke-width="1.5"/>
+<text x="952" y="514" class="sk-svg-small-label sk-svg-mauve">SUMMATIV VURDERING</text>
+<text x="952" y="536" class="sk-svg-helper">Vurdere samlet faglig kompetanse</text>
+<g class="sk-hotspot" data-sk-tip="summativ" tabindex="0" role="button" aria-label="Forklaring: Summativ vurdering"><rect class="sk-hit-area" fill="transparent" stroke="transparent" pointer-events="all" x="934" y="488" width="320" height="62" rx="10"/></g>
+<path d="M356 485 V477 M602 485 V477 M858 485 V477 M1108 485 V477" stroke="#B07A93" stroke-width="2" stroke-dasharray="3 4"/>
+</g>
+</svg>
+</div>
+<div class="sk-glossary" aria-label="Begrepsforklaringer til modellen">
+  <div class="sk-glossary-top"><span class="sk-glossary-kicker">BEGREPER I MODELLEN</span><span class="sk-glossary-hint">Pek, klikk eller bruk Tab på feltene i figuren</span></div>
+  <h3 id="sk-glossary-title">Rammer for læringssekvensen</h3>
+  <p id="sk-glossary-text" aria-live="polite">Mål, potensielle ressurser og institusjonelle mønstre setter betingelsene for elevenes læringsarbeid.</p>
+</div>
+<div class="sk-caption">En didaktisk bearbeiding av modellen «Design av en formell læringssekvens» hos Selander og Kress (2012). Iscenesettingen vises som inngangen til den første transformasjonssyklusen.</div>
+<div class="sk-reading" aria-live="polite" aria-atomic="true">
+  <div><span class="sk-reading-kicker" id="sk-topic"></span><h3 id="sk-title"></h3><p id="sk-explanation"></p></div>
+  <div class="sk-question"><span>SPØRSMÅL TIL FAGGRUPPA</span><p id="sk-question"></p></div>
+</div>
+<div class="sk-slide-note">Bruk knappene eller piltastene når modellen har fokus. Du kan også velge en av de fem delene direkte.</div>
+</div>
+
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="prose col">
     <h2 id="vurdering">Flere tegn enn produktet</h2>
     <p>Læringen viser seg gjennom spor. Når KI har vært med, forteller produktet mindre om hva eleven selv har forstått. Derfor planlegger vi vurderingen sammen med designet, og ser etter flere tegn, lest i sammenheng.</p>
     <div class="callout">
@@ -72,13 +308,16 @@
     <p class="section-intro">Arbeid to og to, gjerne med en kollega fra samme fag. Ta utgangspunkt i et forløp dere skal ha med elevene snart. Det dere bestemmer her, tar dere med inn i verkstedet i bolk 4.</p>
 
     <div class="step step-wide"><span class="n">1</span><div>
-      <h3>Velg læringsmål og plass for KI <span class="time">ca. 10 min</span></h3>
+      <h3>Velg fag, læringsmål og plass for KI <span class="time">ca. 10 min</span></h3>
+      <p>Velg faget ditt. Da får du et eksempel på et forløp knyttet til kompetansemål i gjeldende læreplan, og planleggingsverktøyet viser eksempler fra faget i hvert steg.</p>
+      <div class="fagvalg" id="fagvalg" role="group" aria-label="Velg fag"></div>
+      <div class="fagpanel" id="fagpanel" hidden><p class="tag"></p><h4></h4><p class="fagkjerne"></p><p class="fagmal-tittel"></p><ul class="fagmal"></ul></div>
       <ul class="qs">
         <li>Hva skal elevene forstå eller kunne etter forløpet?</li>
         <li>Hvor i forløpet skal KI stå: iscenesetting, transformering, representasjon eller metarefleksjon?</li>
         <li>Hva skal eleven gjøre selv, og hva skal KI gjøre?</li>
       </ul>
-      <div class="downloads"><a class="row-link" href="verktoy/planlegging.html"><div><p class="tag">Verktøy</p><h3>Design for læring med KI</h3><p>Planlegg forløpet i ni steg, med et spørsmål om KI i hvert steg.</p></div><svg viewBox="0 0 20 20" fill="none" stroke-width="1.5" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a></div>
+      <div class="downloads"><a class="row-link" id="fag-lenke" href="verktoy/planlegging.html"><div><p class="tag">Verktøy</p><h3>Design for læring med KI</h3><p>Planlegg forløpet i ni steg, med et spørsmål om KI i hvert steg.</p></div><svg viewBox="0 0 20 20" fill="none" stroke-width="1.5" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg></a></div>
     </div></div>
 
     <div class="step step-wide"><span class="n">2</span><div>
@@ -114,7 +353,7 @@
       <a href="bolk-4-verksted.html"><span class="when">Bolk 4</span><h3>Verksted: bygg, prøv og juster en KI-agent</h3></a>
       <a href="bolk-2-elevstemmer.html"><span class="when">Bolk 2</span><h3>Tilbake til støtte eller erstatning</h3></a>
     </div>
-    <p class="source"><strong>Kilder:</strong> Kress, G. &amp; Selander, S. (2012). Multimodal design, learning and cultures of recognition. <em>The Internet and Higher Education, 15</em>(4), 265–268. · Selander, S. (2024). Meaning-making and transformative engagement: Notes on Gunther Kress’s social semiotic and multimodal approach to learning. <em>Text &amp; Talk, 44</em>(4), 511–525.</p>
+    <p class="source"><strong>Kilder:</strong> Klafki, W. (2001). Kategorial dannelse: bidrag til en dannelsesteoretisk fortolkning av moderne didaktikk. I E. L. Dale (Red.), <em>Om utdanning – klassiske tekster</em> (s. 167–203). Gyldendal akademisk. · Klafki, W. (2016). <em>Dannelsesteori og didaktik: nye studier</em>. Klim. · Selander, S. &amp; Kress, G. (2012). <em>Design för lärande – ett multimodalt perspektiv</em>. · Kress, G. &amp; Selander, S. (2012). Multimodal design, learning and cultures of recognition. <em>The Internet and Higher Education, 15</em>(4), 265–268. · Selander, S. (2024). Meaning-making and transformative engagement: Notes on Gunther Kress’s social semiotic and multimodal approach to learning. <em>Text &amp; Talk, 44</em>(4), 511–525.</p>
   </div>
 </div>
 
@@ -129,6 +368,70 @@
     </p>
   </div>
 </footer>
+
+<script>
+(function(){
+'use strict';
+const container=document.getElementById('sk-model');if(!container)return;
+const steps=[{"topic": "01 · RAMMER OG DELTAKELSE", "title": "Hva setter rammene for læringssekvensen?", "explanation": "En formell læringssekvens springer ut av mål, potensielle ressurser og institusjonelle mønstre. Elevenes posisjonering, interesse og sosiale interaksjon preger hvordan de går inn i arbeidet, mens lærerens intervensjoner følger prosessen hele veien.", "question": "Hvilke ressurser bruker dere for å gjøre fagstoffet forståelig? KI er én. Hvilke andre?"}, {"topic": "02 · FØRSTE TRANSFORMASJONSSYKLUS", "title": "Iscenesetting og arbeid med ressurser", "explanation": "Læreren iscenesetter et faglig arbeidsrom med mål, oppgaver, ressurser og rammer. Elevene møter fagstoffet, posisjonerer seg og begynner å velge, prøve og omforme tilgjengelige ressurser. Iscenesettingen er her vist som inngangen til den første transformasjonssyklusen.", "question": "Hvilke tegnsystemer, materialer og verktøy gjør det mulig for elevene å utforske fagstoffet, og hvilken plass får KI blant dem?"}, {"topic": "03 · FØRSTE TRANSFORMASJONSSYKLUS", "title": "Bearbeiding og representasjon", "explanation": "Elevene undersøker, velger, kombinerer og bearbeider ressurser. Forståelsen får form gjennom en representasjon, for eksempel en forklaring, modell, tekst, lyd eller et praktisk produkt. Dette gir et grunnlag for å arbeide videre med faglig mening.", "question": "Hvor står KI, og hva bruker elevene når de bearbeider fagstoffet? Lager de noe synlig av forståelsen, eller blir den i KI-chatten?"}, {"topic": "04 · ANDRE TRANSFORMASJONSSYKLUS", "title": "Diskusjon og metarefleksjon", "explanation": "Representasjonene presenteres, fortolkes og drøftes. Elevene kan sette ord på faglige valg, sammenligne perspektiver og videreutvikle forståelsen gjennom diskusjon og metarefleksjon. Lærerens spørsmål og elevenes bidrag påvirker hvordan samtalen utvikler seg.", "question": "Hvordan legger dere til rette for samtaler der elevene reflekterer over egen forståelse og egen KI-bruk? Er det dere, KI eller elevene som stiller spørsmålene?"}, {"topic": "05 · FORMATIV OG SUMMATIV VURDERING", "title": "Å følge læringen og vurdere kompetansen", "explanation": "Formativ vurdering inngår i læringsprosessen. Læreren observerer, lytter, undersøker elevenes resonnementer og bruker innsikten til respons og videre didaktiske valg. Summativ vurdering innebærer å sammenfatte et tilstrekkelig og faglig relevant grunnlag for å vurdere kompetansen på et gitt tidspunkt. Prosessen, representasjonene og elevenes begrunnelser kan alle bidra til vurderingsgrunnlaget.", "question": "Hvilke tegn ser dere etter for å vite hva eleven har forstått, når KI kan ha laget produktet? Fanger dere dem opp underveis, eller først i etterkant?"}];
+const glossary={"eleven": {"title": "Elevenes posisjonering, interesse og sosiale interaksjon", "text": "Elevene møter fagstoffet med ulike erfaringer, interesser og roller i fellesskapet. Hvordan de oppfatter sin plass, velger å delta og samhandler med andre, påvirker hvilke ressurser de tar i bruk og hvordan de skaper mening gjennom hele læringsforløpet."}, "rammer": {"title": "Rammer for læringssekvensen", "text": "Mål, potensielle ressurser og institusjonelle mønstre setter betingelsene for elevenes læringsarbeid. Ressursene er tegnsystemer, medier, materialer og verktøy, og KI er én av dem. De institusjonelle mønstrene er normer, rutiner og regler."}, "iscenesetting": {"title": "Iscenesetting", "text": "Læreren iscenesetter et rom for læring ved å åpne fagstoffet og skape muligheter for utforsking, deltakelse og faglig arbeid."}, "transformasjon": {"title": "Transformasjon", "text": "Elevene velger, prøver ut, kombinerer og omformer tilgjengelige ressurser når de utvikler mening og faglig forståelse."}, "bearbeiding": {"title": "Bearbeiding", "text": "Elevene videreutvikler forståelsen gjennom å undersøke, prøve ut og omforme innholdet med ulike tegnsystemer og medier."}, "representasjon": {"title": "Representasjon", "text": "Elevene gir forståelsen form gjennom uttrykk som tekst, bilde, lyd, modeller, handlinger eller praktiske produkter."}, "andre_syklus": {"title": "Andre transformasjonssyklus", "text": "Elevenes representasjoner blir utgangspunkt for deling, diskusjon og metarefleksjon, slik at forståelsen kan bearbeides videre."}, "refleksjon": {"title": "Diskusjon og metarefleksjon", "text": "Elevene setter ord på hva de har gjort, begrunner faglige valg og undersøker hvordan forståelsen kan videreutvikles."}, "larer": {"title": "Lærerens posisjonering og intervensjon", "text": "Læreren følger læringsprosessen, stiller spørsmål, støtter og utfordrer elevenes faglige arbeid gjennom hele sekvensen."}, "formativ": {"title": "Formativ vurdering", "text": "Lærer og elever bruker tegn på forståelse underveis til å gi respons, justere arbeidet og støtte videre læring."}, "summativ": {"title": "Summativ vurdering", "text": "Læreren sammenfatter et relevant og tilstrekkelig grunnlag for å vurdere elevenes kompetanse på et gitt tidspunkt."}};
+let current=0;
+const get=id=>document.getElementById(id);
+const next=get('sk-next'),back=get('sk-back'),tabs=[...container.querySelectorAll('[data-sk-step]')];
+const hotspots=[...container.querySelectorAll('[data-sk-tip]')];
+let selectedTip='rammer';
+function showGlossary(key){const d=glossary[key];if(!d)return;selectedTip=key;get('sk-glossary-title').textContent=d.title;get('sk-glossary-text').textContent=d.text;hotspots.forEach(el=>el.classList.toggle('sk-selected',el.dataset.skTip===key));}
+hotspots.forEach(el=>{
+ el.addEventListener('pointerenter',()=>showGlossary(el.dataset.skTip));
+ el.addEventListener('focus',()=>showGlossary(el.dataset.skTip));
+ el.addEventListener('click',()=>showGlossary(el.dataset.skTip));
+ el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showGlossary(el.dataset.skTip);}});
+});
+function render(){
+ container.querySelectorAll('[data-sk-reveal]').forEach(el=>{el.classList.toggle('sk-visible',Number(el.dataset.skReveal)<=current);});
+ if(!hotspots.some(el=>el.dataset.skTip===selectedTip&&(!el.closest('[data-sk-reveal]')||el.closest('[data-sk-reveal]').classList.contains('sk-visible')))){showGlossary(['rammer','iscenesetting','representasjon','andre_syklus','formativ'][current]);}
+ tabs.forEach((t,i)=>{t.setAttribute('aria-pressed',String(i===current));t.setAttribute('aria-label','Vis del '+(i+1)+': '+steps[i].title);});
+ get('sk-progress').textContent=(current+1)+' av '+steps.length;
+ get('sk-topic').textContent=steps[current].topic;
+ get('sk-title').textContent=steps[current].title;
+ get('sk-explanation').textContent=steps[current].explanation;
+ get('sk-question').textContent=steps[current].question;
+ back.disabled=current===0;next.disabled=current===steps.length-1;
+ next.textContent=current===steps.length-1?'Hele modellen vist':'Neste del →';
+}
+function setStep(v){current=Math.max(0,Math.min(steps.length-1,v));render();}
+tabs.forEach((t,i)=>t.addEventListener('click',()=>setStep(i)));
+next.addEventListener('click',()=>setStep(current+1));back.addEventListener('click',()=>setStep(current-1));
+container.addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON')return;if(e.key==='ArrowRight'){e.preventDefault();setStep(current+1)}else if(e.key==='ArrowLeft'){e.preventDefault();setStep(current-1)}});
+render();showGlossary('rammer');
+})();
+</script>
+<script src="verktoy/fag.js"></script>
+<script>
+(function(){
+'use strict';
+var F=window.VGS_FAG,O=window.VGS_FAG_ORDER,row=document.getElementById('fagvalg'),panel=document.getElementById('fagpanel'),link=document.getElementById('fag-lenke');
+if(!F||!row)return;
+var chosen='';try{chosen=localStorage.getItem('nkir-fag')||'';}catch(e){}
+if(!F[chosen])chosen='';
+row.innerHTML=O.map(function(k){return '<button type="button" data-fag="'+k+'" style="--c:'+F[k].farge+'" aria-pressed="false"><i aria-hidden="true"></i>'+F[k].navn+'</button>';}).join('');
+function show(){
+ row.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.fag===chosen));});
+ if(!chosen){panel.hidden=true;link.href='verktoy/planlegging.html';link.querySelector('h3').textContent='Design for læring med KI';link.querySelector('p:not(.tag)').textContent='Planlegg forløpet i ni steg, med et spørsmål om KI i hvert steg. Velg fag over for å få eksempler fra faget ditt.';return;}
+ var f=F[chosen];panel.hidden=false;panel.style.setProperty('--c',f.farge);
+ panel.querySelector('.tag').textContent='Eksempel i '+f.navn.toLowerCase();
+ panel.querySelector('h4').textContent=f.tema;
+ panel.querySelector('.fagkjerne').textContent=f.kjerne;
+ var t=panel.querySelector('.fagmal-tittel');t.innerHTML='';t.appendChild(document.createTextNode('Kompetansemål ('+f.plan.trinn+', '));var a=document.createElement('a');a.href=f.plan.url;a.target='_blank';a.rel='noopener';a.textContent=f.plan.kode;t.appendChild(a);t.appendChild(document.createTextNode(')'));
+ var ul=panel.querySelector('.fagmal');ul.innerHTML='';f.mal.forEach(function(m){var li=document.createElement('li');li.textContent='«'+m+'»';ul.appendChild(li);});
+ link.href='verktoy/planlegging.html?fag='+chosen;
+ link.querySelector('h3').textContent='Design for læring med KI · '+f.navn;
+ link.querySelector('p:not(.tag)').textContent='Planlegg forløpet i ni steg. Hvert steg har et eksempel fra '+f.navn.toLowerCase()+' og et spørsmål om KI.';
+}
+row.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;chosen=(chosen===b.dataset.fag)?'':b.dataset.fag;try{chosen?localStorage.setItem('nkir-fag',chosen):localStorage.removeItem('nkir-fag');}catch(e){}show();});
+show();
+})();
+</script>
 
 </body>
 </html>
